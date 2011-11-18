@@ -11,10 +11,9 @@ import java.io.*;
  * @author Vinicius
  */
 public class BancoDeDados {
-    private String[][] memoriaConexoes;
-    private final int ITEMS_CONEXAO = 3; //numero de colunas
+    private String[] memoriaConexoes;
     
-  public void BancoDeDado() {
+  public void BancoDeDados() {
         inicializaMemoriaConexoes();
     }
   
@@ -23,17 +22,13 @@ public class BancoDeDados {
         int tamMemoria = 0;
         int i = 0;
         try {
-            BufferedReader in = new BufferedReader(new FileReader("//src//tabs//conexoes.txt"));
+            BufferedReader in = new BufferedReader(new FileReader("//src//Webcache//conexoes"));
             str = in.readLine();
             tamMemoria = Integer.parseInt(str);
             //System.out.println("INDICE: " + str);
-            memoriaConexoes = new String[tamMemoria + 1][ITEMS_CONEXAO];
+            memoriaConexoes = new String[tamMemoria + 1];
             while ((str = in.readLine()) != null) {
-                if (str.length() > 12) {
-
-                    memoriaConexoes[i] = str.split(";");
-                    i++;
-                }
+                    memoriaConexoes[i] = str;
             }
             in.close();
         } catch (IOException e) {
@@ -41,6 +36,14 @@ public class BancoDeDados {
         }
     }
   
+  
+  public String[] getMemoria()
+  {
+      return memoriaConexoes;
+  }
+  
+      public static void main(String[] args) throws IOException{
+    }
 }
 
 
