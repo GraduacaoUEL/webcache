@@ -18,7 +18,7 @@ public class BancoDeDados {
     private int tamanhoMemoria;
 
     public void BancoDeDados() {
-                
+
         inicializaMemoriaConexoes();
     }
 
@@ -33,9 +33,9 @@ public class BancoDeDados {
             //System.out.println("INDICE: " + str);
             memoriaConexoes = new String[tamanhoMemoria + 1];
             while ((str = in.readLine()) != null) {
-                if(str != "null"){
-                memoriaConexoes[i] = str;
-                i++;
+                if (str != "null") {
+                    memoriaConexoes[i] = str;
+                    i++;
                 }
             }
             in.close();
@@ -52,8 +52,7 @@ public class BancoDeDados {
         escreveNoArquivo(novoIP);
     }
 
-    private void escreveNoArquivo(String novoIP)
-    {
+    private void escreveNoArquivo(String novoIP) {
         /*Limpa o arquivo antes de escrever*/
         RandomAccessFile file;
         try {
@@ -84,14 +83,41 @@ public class BancoDeDados {
             out.close();
         } catch (IOException e) {
             e.getMessage();
-        
-        } 
-           
+
+        }
+
     }
-    
+
+    public void ResetarBanco() {
+        BufferedWriter out;
+        RandomAccessFile file;
+        try {
+             file = new RandomAccessFile("src\\Webcache\\conexoes", "rw");
+            file.setLength(0);
+            file.close();
+            
+            out = new BufferedWriter(new FileWriter("src\\Webcache\\conexoes"));
+        out.write("4");
+        out.newLine();
+        out.write("127.0.0.1");
+        out.newLine();
+        out.write("127.0.0.1");
+        out.newLine();
+        out.write("127.0.0.1");
+        out.newLine();
+        out.write("127.0.0.1");
+        out.newLine();
+        out.close();
+        } catch (IOException ex) {
+           
+        }
+
+    }
+
     public static void main(String[] args) throws IOException {
         BancoDeDados bd = new BancoDeDados();
         bd.inicializaMemoriaConexoes();
-        bd.novoIP("127.1.1.0");
+        bd.ResetarBanco();
+        
     }
 }
