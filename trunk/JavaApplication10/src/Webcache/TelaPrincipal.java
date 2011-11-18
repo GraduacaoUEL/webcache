@@ -24,7 +24,6 @@ public class TelaPrincipal extends JPanel {
         //mainFrame.setLayout(null);
         
         
-        
         proxyPanel = new JPanel();
         //proxyPanel.setLayout(null);
         
