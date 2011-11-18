@@ -4,6 +4,8 @@
  */
 package Webcache;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author Vinicius
@@ -14,6 +16,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("BLA BLA BLA ");
+        TelaPrincipal t = new TelaPrincipal();
+        JFrame principal = new JFrame("Tela Principal");
+        t.buildGUI();
     }
 }
