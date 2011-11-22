@@ -19,7 +19,6 @@ public class BancoDeDados {
     
 
     public void BancoDeDados() {
-       
         inicializaMemoriaConexoes();
     }
 
@@ -28,7 +27,7 @@ public class BancoDeDados {
         //lista.
     }
     
-    private void inicializaMemoriaConexoes() {
+    public void inicializaMemoriaConexoes() {
         String str = new String();
 
         int i = 0;

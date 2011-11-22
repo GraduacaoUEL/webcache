@@ -33,24 +33,41 @@ public class RunClient {
     private Socket sockWithClient;
     private BufferedReader readerWithClient;
     private PrintWriter writerWithClient;
+    private ArrayList listaClientes; 
 
     public static void main(String[] args) {
         RunClient rc = new RunClient();
+        BancoDeDados bd = new BancoDeDados();
+        bd.inicializaMemoriaConexoes();
+        rc.listaClientes = bd.getMemoria();
+        Iterator it = rc.listaClientes.iterator();
+        rc.conectarServidor(it.next().toString());
+        //rc.criarSocketCliente();
+        //rc.conectarCliente("127.0.0.1");
+
     }
 
-    public RunClient() {
+    public void criarSocketCliente()
+    {
+        //Ativa a parte que comunicação direta com outros clientes        
+        connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
+        connectionClientClient_Thread.start();
+    }
+    
+    public boolean conectarServidor(String ip)
+    {
         //Ativa a parte de conexão com o Servidor Mestre
         connectionToMasterServer_Thread = new Thread(new connectionToMasterServer("127.0.0.1", 5555));
         connectionToMasterServer_Thread.start();
-
-        //Ativa a parte que comunicação direta com outros clientes        
-        //connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
-        //connectionClientClient_Thread.start();
-        
-        connectionWithClient_Thread = new Thread(new startConnectionWithClient("127.0.0.1", 5556));
-        connectionWithClient_Thread.start();
+        return true;
     }
-
+    
+    public boolean conectarCliente(String ip)
+    {
+        connectionWithClient_Thread = new Thread(new startConnectionWithClient(ip, 5556));
+        connectionWithClient_Thread.start();
+        return true;
+    }
     //Realiza conexão com o Servidor Mestre
     private class connectionToMasterServer implements Runnable {
 
