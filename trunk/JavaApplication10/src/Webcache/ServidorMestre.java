@@ -25,7 +25,8 @@ public class ServidorMestre implements Runnable {
     private ArrayList clientOutputStreams;
     private ServerSocket serverSocket;
     private Thread t;
-    private Map hashTable;
+    //private Map hashTable;
+    private ArrayList listIP;
     private int countClient;
 
     public static void main(String[] args) {
@@ -36,7 +37,8 @@ public class ServidorMestre implements Runnable {
 
     //Construtor - Ativa o Socket para a comunicação com os clientes
     public ServidorMestre(int port) {
-        hashTable = new Hashtable();
+        //hashTable = new Hashtable();
+        listIP = new ArrayList();
         countClient = 0;
         try {
             serverSocket = new ServerSocket(port);
@@ -45,7 +47,8 @@ public class ServidorMestre implements Runnable {
             String ipText = String.valueOf(InetAddress.getLocalHost().getHostAddress());
             ipText = ipText.replace("/", "");
             System.out.println("IP server: " + ipText);
-            hashTable.put(countClient, ipText);
+            //hashTable.put(countClient, ipText);
+            listIP.add(ipText);
             countClient++;
 
             System.out.println("Socket do Servidor ativado");
@@ -104,9 +107,11 @@ public class ServidorMestre implements Runnable {
 
                     if (mensagem[0].equals("IP")) {
                         System.out.println("Mensagem do Cliente " + countClient + ": " + mensagem[1]);
-                        hashTable.put(countClient, mensagem[1]);
+                        //hashTable.put(countClient, mensagem[1]);
+                        listIP.add(mensagem[1]);
                         countClient++;
-                        System.out.println("Tabela HASH: " + hashTable);
+                        //System.out.println("Tabela HASH: " + hashTable);
+                        System.out.println("Lista de IP's: " + listIP);
                     }
                 }
 
