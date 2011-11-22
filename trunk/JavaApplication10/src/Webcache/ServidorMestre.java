@@ -34,12 +34,14 @@ public class ServidorMestre implements Runnable {
         sm.start();
     }
 
+    //Construtor - Ativa o Socket para a comunicação com os clientes
     public ServidorMestre(int port) {
         hashTable = new Hashtable();
         countClient = 0;
         try {
             serverSocket = new ServerSocket(port);
             
+            //IP do Servidor Mestre
             String ipText = String.valueOf(InetAddress.getLocalHost().getHostAddress());
             ipText = ipText.replace("/", "");
             System.out.println("IP server: " + ipText);
@@ -53,6 +55,7 @@ public class ServidorMestre implements Runnable {
         }
     }
 
+    //Estabelece conexão a cada nova requisição
     @Override
     public void run() {
         clientOutputStreams = new ArrayList<String>();
@@ -71,6 +74,7 @@ public class ServidorMestre implements Runnable {
         }
     }
 
+    //Mantém escuta com cada cliente
     public class ClientHandler implements Runnable {
 
         BufferedReader reader;
@@ -91,6 +95,8 @@ public class ServidorMestre implements Runnable {
             String[] mensagem = new String[20];
             String message;
             try {
+                
+                //Se o cliente enviar alguma mensagem
                 while ((message = reader.readLine()) != null) {
                     mensagem = message.split(";");
                     
@@ -100,14 +106,28 @@ public class ServidorMestre implements Runnable {
                         System.out.println("Tabela HASH: " + hashTable);                        
                     }
                 }
+                
             } catch (Exception ex) {
                 System.out.println("CONEXÃO COM O CLIENTE ENCERRADA");
+                try { 
+                    reader.close();
+                    sock.close();
+                } catch(IOException ioe) {
+                    ioe.printStackTrace();
+                }
                 ex.printStackTrace();
             } finally {
+                try { 
+                    reader.close();
+                    sock.close();
+                } catch(IOException ioe) {
+                    ioe.printStackTrace();
+                }
             }
         }
     }
 
+    //Envia mensagem para todos os clientes conectados ao Servidor Mestre
     private void tellEveryone(String message) {
         Iterator it = clientOutputStreams.iterator();
         while (it.hasNext()) {
