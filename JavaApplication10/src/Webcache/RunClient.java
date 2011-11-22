@@ -22,14 +22,17 @@ public class RunClient {
 
     //Atributos para conexão com Servidor Mestre
     private Thread connectionToMasterServer_Thread;
-    private PrintWriter writer;
-    private Socket sock;
-    private BufferedReader reader;
+    private PrintWriter writerMasterServer;
+    private Socket sockMasterServer;
+    private BufferedReader readerMasterServer;
     
     //Atributos para ativa o Socket de comunicação com outros clientes
     private ServerSocket connectionClientClient_Socket;
-    private Thread connectionClientClient_Thread, newClient;
+    private Thread connectionClientClient_Thread, connectionWithClient_Thread, newClient_Thread;
     private ArrayList clientOutputStreams;
+    private Socket sockWithClient;
+    private BufferedReader readerWithClient;
+    private PrintWriter writerWithClient;
 
     public static void main(String[] args) {
         RunClient rc = new RunClient();
@@ -43,8 +46,9 @@ public class RunClient {
         //Ativa a parte que comunicação direta com outros clientes        
         connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
         connectionClientClient_Thread.start();
-        //connectionClientClient_Thread = new Thread(new connectionToMasterServer("127.0.0.1", 5556));
-        //connectionClientClient_Thread.start();
+        
+        connectionWithClient_Thread = new Thread(new startConnectionWithClient("127.0.0.1", 5556));
+        connectionWithClient_Thread.start();
     }
 
     //Realiza conexão com o Servidor Mestre
@@ -53,17 +57,17 @@ public class RunClient {
         //Construtor
         public connectionToMasterServer(String ipServer, int portServer) {
             try {
-                sock = new Socket(ipServer, portServer);
-                InputStreamReader streamReader = new InputStreamReader(sock.getInputStream());
-                reader = new BufferedReader(streamReader);
-                writer = new PrintWriter(sock.getOutputStream());
+                sockMasterServer = new Socket(ipServer, portServer);
+                InputStreamReader streamReader = new InputStreamReader(sockMasterServer.getInputStream());
+                readerMasterServer = new BufferedReader(streamReader);
+                writerMasterServer = new PrintWriter(sockMasterServer.getOutputStream());
                 System.out.println("Conexão com o Servidor estabelecida...");
 
                 try {
                     String ipText = String.valueOf(InetAddress.getLocalHost().getHostAddress());
                     ipText = ipText.replace("/", "");
-                    writer.println("IP;" + ipText);
-                    writer.flush();
+                    writerMasterServer.println("IP;" + ipText);
+                    writerMasterServer.flush();
                 } catch (Exception ex) {
                     System.out.println("FALHA AO COMUNICAR COM O SERVIDOR");
                     ex.printStackTrace();
@@ -80,15 +84,15 @@ public class RunClient {
             try {
 
                 //Mensagem que vem do Servidor Mestre
-                while ((message = reader.readLine()) != null) {
+                while ((message = readerMasterServer.readLine()) != null) {
                     System.out.println(message);
                 }
 
                 try {
                     connectionToMasterServer_Thread.interrupt();
-                    reader.close();
-                    writer.close();
-                    sock.close();
+                    readerMasterServer.close();
+                    writerMasterServer.close();
+                    sockMasterServer.close();
                 } catch (IOException ioE) {
                     ioE.printStackTrace();
                 }
@@ -97,18 +101,18 @@ public class RunClient {
                 ex.printStackTrace();
                 try {
                     connectionToMasterServer_Thread.interrupt();
-                    reader.close();
-                    writer.close();
-                    sock.close();
+                    readerMasterServer.close();
+                    writerMasterServer.close();
+                    sockMasterServer.close();
                 } catch (IOException ioE) {
                     ioE.printStackTrace();
                 }
             } finally {
                 try {
                     connectionToMasterServer_Thread.interrupt();
-                    reader.close();
-                    writer.close();
-                    sock.close();
+                    readerMasterServer.close();
+                    writerMasterServer.close();
+                    sockMasterServer.close();
                 } catch (IOException ioE) {
                     ioE.printStackTrace();
                 }
@@ -116,7 +120,7 @@ public class RunClient {
         }
     }//Fim do connectionToMasterServer
 
-    //Conexão entre Cliente-Cliente
+    //Conexão entre Cliente-Cliente (Esculta)
     private class connectionClientClient implements Runnable {
 
         //Construtor
@@ -136,8 +140,8 @@ public class RunClient {
                 Socket clientSocket = connectionClientClient_Socket.accept();
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                 clientOutputStreams.add(writer);
-                newClient = new Thread(new ClientHandler(clientSocket));
-                newClient.start();
+                newClient_Thread = new Thread(new ClientHandler(clientSocket));
+                newClient_Thread.start();
 
                 tellTheNeighbor("Olá vizinho!");
 
@@ -149,14 +153,14 @@ public class RunClient {
 
         private class ClientHandler implements Runnable {
 
-            BufferedReader reader;
-            Socket sock;
+            BufferedReader readerClientClient;
+            Socket sockClientClient;
 
             public ClientHandler(Socket clientSocket) {
                 try {
-                    sock = clientSocket;
-                    InputStreamReader isReader = new InputStreamReader(sock.getInputStream());
-                    reader = new BufferedReader(isReader);
+                    sockClientClient = clientSocket;
+                    InputStreamReader isReader = new InputStreamReader(sockClientClient.getInputStream());
+                    readerClientClient = new BufferedReader(isReader);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -167,22 +171,22 @@ public class RunClient {
                 try {
 
                     //Se o cliente enviar alguma mensagem
-                    while ((message = reader.readLine()) != null) {
+                    while ((message = readerClientClient.readLine()) != null) {
                     }
 
                 } catch (Exception ex) {
                     System.out.println("CONEXÃO COM O CLIENTE ENCERRADA");
                     try {
-                        reader.close();
-                        sock.close();
+                        readerClientClient.close();
+                        sockClientClient.close();
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                     }
                     ex.printStackTrace();
                 } finally {
                     try {
-                        reader.close();
-                        sock.close();
+                        readerClientClient.close();
+                        sockClientClient.close();
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                     }
@@ -203,4 +207,73 @@ public class RunClient {
             }
         }
     }//Fim do connectionClientClient
+    
+    //Conexão entre Cliente-Cliente (Procura)
+    private class startConnectionWithClient implements Runnable {
+
+        //Construtor
+        public startConnectionWithClient(String ipServer, int portServer) {
+            try {
+                sockWithClient = new Socket(ipServer, portServer);
+                InputStreamReader streamReader = new InputStreamReader(sockWithClient.getInputStream());
+                readerWithClient = new BufferedReader(streamReader);
+                writerWithClient = new PrintWriter(sockWithClient.getOutputStream());
+                System.out.println("Conexão com o Cliente estabelecida...");
+
+                try {
+                    String ipText = String.valueOf(InetAddress.getLocalHost().getHostAddress());
+                    ipText = ipText.replace("/", "");
+                    writerWithClient.println("IP;" + ipText);
+                    writerWithClient.flush();
+                } catch (Exception ex) {
+                    System.out.println("FALHA AO COMUNICAR COM O CLIENTE");
+                    ex.printStackTrace();
+                }
+            } catch (IOException ex) {
+                System.out.println("FALHA AO TENTAR CONECTAR COM O CLIENTE");
+                ex.printStackTrace();
+            }
+        }
+
+        //O que a Thread irá executar
+        public void run() {
+            String message;
+            try {
+
+                //Mensagem que vem do Servidor Mestre
+                while ((message = readerWithClient.readLine()) != null) {
+                    System.out.println(message);
+                }
+
+                try {
+                    connectionToMasterServer_Thread.interrupt();
+                    readerWithClient.close();
+                    writerWithClient.close();
+                    sockWithClient.close();
+                } catch (IOException ioE) {
+                    ioE.printStackTrace();
+                }
+            } catch (Exception ex) {
+                System.out.println("CONEXÃO COM O CLIENTE ENCERRADA");
+                ex.printStackTrace();
+                try {
+                    connectionToMasterServer_Thread.interrupt();
+                    readerWithClient.close();
+                    writerWithClient.close();
+                    sockWithClient.close();
+                } catch (IOException ioE) {
+                    ioE.printStackTrace();
+                }
+            } finally {
+                try {
+                    connectionToMasterServer_Thread.interrupt();
+                    readerWithClient.close();
+                    writerWithClient.close();
+                    sockWithClient.close();
+                } catch (IOException ioE) {
+                    ioE.printStackTrace();
+                }
+            }
+        }
+    }//Fim do startConnectionWithClient
 }
