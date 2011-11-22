@@ -47,7 +47,7 @@ public class RunClient {
         connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
         connectionClientClient_Thread.start();
         
-        connectionWithClient_Thread = new Thread(new startConnectionWithClient("127.0.0.1", 5556));
+        connectionWithClient_Thread = new Thread(new startConnectionWithClient("10.65.7.130", 5556));
         connectionWithClient_Thread.start();
     }
 
@@ -143,7 +143,8 @@ public class RunClient {
                 newClient_Thread = new Thread(new ClientHandler(clientSocket));
                 newClient_Thread.start();
 
-                tellTheNeighbor("Olá vizinho!");
+                tellTheNeighbor("Olá vizinho!!!");
+                System.out.println("Olá vizinho de novo!");
 
             } catch (Exception ex) {
                 System.out.println("FALHA AO ESTABELECER CONEXÃO COM O CLIENTE");
@@ -220,7 +221,7 @@ public class RunClient {
                 writerWithClient = new PrintWriter(sockWithClient.getOutputStream());
                 System.out.println("Conexão com o Cliente estabelecida...");
 
-                try {
+                /*try {
                     String ipText = String.valueOf(InetAddress.getLocalHost().getHostAddress());
                     ipText = ipText.replace("/", "");
                     writerWithClient.println("IP;" + ipText);
@@ -228,7 +229,8 @@ public class RunClient {
                 } catch (Exception ex) {
                     System.out.println("FALHA AO COMUNICAR COM O CLIENTE");
                     ex.printStackTrace();
-                }
+                }*/
+                System.out.println("Um vizinho conectou-se");
             } catch (IOException ex) {
                 System.out.println("FALHA AO TENTAR CONECTAR COM O CLIENTE");
                 ex.printStackTrace();

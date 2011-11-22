@@ -29,7 +29,7 @@ public class ServidorMestre implements Runnable {
     private int countClient;
 
     public static void main(String[] args) {
-        
+
         Thread sm = new Thread(new ServidorMestre(5555));
         sm.start();
     }
@@ -40,7 +40,7 @@ public class ServidorMestre implements Runnable {
         countClient = 0;
         try {
             serverSocket = new ServerSocket(port);
-            
+
             //IP do Servidor Mestre
             String ipText = String.valueOf(InetAddress.getLocalHost().getHostAddress());
             ipText = ipText.replace("/", "");
@@ -60,13 +60,15 @@ public class ServidorMestre implements Runnable {
     public void run() {
         clientOutputStreams = new ArrayList<String>();
         try {
-            Socket clientSocket = serverSocket.accept();
-            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
-            clientOutputStreams.add(writer);
-            t = new Thread(new ClientHandler(clientSocket));
-            t.start();
-            
-            tellEveryone("Atualizando Lista de Clientes");
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
+                clientOutputStreams.add(writer);
+                t = new Thread(new ClientHandler(clientSocket));
+                t.start();
+
+                tellEveryone("Atualizando Lista de Clientes");
+            }
 
         } catch (Exception ex) {
             System.out.println("FALHA AO ESTABELECER CONEXÃO COM O CLIENTE");
@@ -95,32 +97,33 @@ public class ServidorMestre implements Runnable {
             String[] mensagem = new String[20];
             String message;
             try {
-                
+
                 //Se o cliente enviar alguma mensagem
                 while ((message = reader.readLine()) != null) {
                     mensagem = message.split(";");
-                    
-                    if(mensagem[0].equals("IP")) {
+
+                    if (mensagem[0].equals("IP")) {
                         System.out.println("Mensagem do Cliente " + countClient + ": " + mensagem[1]);
                         hashTable.put(countClient, mensagem[1]);
-                        System.out.println("Tabela HASH: " + hashTable);                        
+                        countClient++;
+                        System.out.println("Tabela HASH: " + hashTable);
                     }
                 }
-                
+
             } catch (Exception ex) {
                 System.out.println("CONEXÃO COM O CLIENTE ENCERRADA");
-                try { 
+                try {
                     reader.close();
                     sock.close();
-                } catch(IOException ioe) {
+                } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
                 ex.printStackTrace();
             } finally {
-                try { 
+                try {
                     reader.close();
                     sock.close();
-                } catch(IOException ioe) {
+                } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
             }
