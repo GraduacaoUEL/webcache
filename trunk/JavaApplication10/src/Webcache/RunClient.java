@@ -40,11 +40,11 @@ public class RunClient {
         connectionToMasterServer_Thread = new Thread(new connectionToMasterServer("127.0.0.1", 5555));
         connectionToMasterServer_Thread.start();
 
-        //Ativa a parte que comunicação direta com outros clientes
-        //connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
-        //connectionClientClient_Thread.start();
-        connectionClientClient_Thread = new Thread(new connectionToMasterServer("127.0.0.1", 5556));
+        //Ativa a parte que comunicação direta com outros clientes        
+        connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
         connectionClientClient_Thread.start();
+        //connectionClientClient_Thread = new Thread(new connectionToMasterServer("127.0.0.1", 5556));
+        //connectionClientClient_Thread.start();
     }
 
     //Realiza conexão com o Servidor Mestre
