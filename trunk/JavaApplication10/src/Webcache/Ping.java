@@ -25,7 +25,7 @@ public class Ping {
     {
         long data = System.currentTimeMillis();
             try {
-                InetAddress.getByName(ip).isReachable(0);
+                InetAddress.getByName(ip).isReachable(10);
             } catch (IOException ex) {
                 Logger.getLogger(Ping.class.getName()).log(Level.SEVERE, null, ex);
             }
