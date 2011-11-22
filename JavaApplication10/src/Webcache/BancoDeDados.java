@@ -5,8 +5,8 @@
 package Webcache;
 
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -14,27 +14,33 @@ import java.util.logging.Logger;
  */
 public class BancoDeDados {
 
-    private String[] memoriaConexoes;
+    private ArrayList memoriaConexoes;
     private int tamanhoMemoria;
+    
 
     public void BancoDeDados() {
-
+       
         inicializaMemoriaConexoes();
     }
 
+    public void escreverTabela(ArrayList lista)
+    {
+        //lista.
+    }
+    
     private void inicializaMemoriaConexoes() {
         String str = new String();
 
         int i = 0;
         try {
+            memoriaConexoes = new ArrayList<String>();
             BufferedReader in = new BufferedReader(new FileReader("src\\Webcache\\conexoes"));
             str = in.readLine();
             tamanhoMemoria = Integer.parseInt(str);
             //System.out.println("INDICE: " + str);
-            memoriaConexoes = new String[tamanhoMemoria + 1];
             while ((str = in.readLine()) != null) {
-                if (str != "null") {
-                    memoriaConexoes[i] = str;
+                if (!str.equals("null")) {
+                    memoriaConexoes.add(str);
                     i++;
                 }
             }
@@ -44,7 +50,7 @@ public class BancoDeDados {
         }
     }
 
-    public String[] getMemoria() {
+    public ArrayList getMemoria() {
         return memoriaConexoes;
     }
 
@@ -65,16 +71,16 @@ public class BancoDeDados {
             BufferedWriter out = new BufferedWriter(new FileWriter("src\\Webcache\\conexoes"));
             //buffer = preparaString();
 
-            tamanhoMemoria++;
-            buffer = Integer.toString(tamanhoMemoria);
+            buffer = Integer.toString(memoriaConexoes.size() + 1);
             out.write(buffer);
             out.newLine();
-            for (int i = 0; i < tamanhoMemoria; i++) {
-                buffer = "";
-                buffer += memoriaConexoes[i];
-                out.write(buffer);
-                out.newLine();
-            }
+            Iterator it = memoriaConexoes.iterator();
+                while(it.hasNext()) {
+                    buffer = "";
+                    buffer += it.next();
+                    out.write(buffer);
+                    out.newLine();
+                }
             out.write(novoIP);
             out.newLine();
 
@@ -117,7 +123,7 @@ public class BancoDeDados {
     public static void main(String[] args) throws IOException {
         BancoDeDados bd = new BancoDeDados();
         bd.inicializaMemoriaConexoes();
-        bd.ResetarBanco();
-        
+       // bd.ResetarBanco();
+        bd.escreveNoArquivo("127.0.0.1");
     }
 }
