@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package webcache;
+package Webcache;
 
 import java.io.IOException;
 
@@ -16,10 +16,7 @@ public class WebCache {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException{
-        Server sr = new Server();
-        sr.run();
-        
-//       Ping p = new Ping();
-//       p.start();
+        BrowserHandler browserHandler = new BrowserHandler(5557);
+        browserHandler.run();
     }
 }
