@@ -69,14 +69,25 @@ public class ServidorMestre implements Runnable {
                 clientOutputStreams.add(writer);
                 t = new Thread(new ClientHandler(clientSocket));
                 t.start();
-
-                tellEveryone("Atualizando Lista de Clientes");
+                
+                tellEveryone(listaClientes(listIP));
             }
 
         } catch (Exception ex) {
             System.out.println("FALHA AO ESTABELECER CONEXÃO COM O CLIENTE");
             ex.printStackTrace();
         }
+    }
+
+    private String listaClientes(ArrayList list) {
+        String str = "";
+        str += "IP;";
+        Iterator it = list.iterator();
+        while(it.hasNext())
+        {
+            str += it.next() + ";"; 
+        }
+        return str;
     }
 
     //Mantém escuta com cada cliente
