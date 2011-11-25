@@ -29,22 +29,36 @@ public class TelaPrincipal extends JPanel {
         
         JTextField usuario = new JTextField(30);
         JTextField senha = new JTextField(30);
-        Checkbox proxyCheckBox = new Checkbox("Usar Proxy",false);
+        Checkbox proxyCheckBox = new Checkbox("Usar Proxy",false);     
+        JButton okButton =  new JButton("Confirmar");
         
+        okButton.setBounds(0, 0, 30, 40);
         proxyCheckBox.setBounds(0, 0, 100, 30);
+        
         usuario.setText("usuario");
         senha.setText("senha");
         
+
         proxyPanel.add(proxyCheckBox);
         proxyPanel.add(usuario);
         proxyPanel.add(senha);
+        proxyPanel.add(okButton);
         
-      
+        
  
         mainFrame.getContentPane().add(BorderLayout.CENTER, proxyPanel);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         mainFrame.setSize(800,600);
         mainFrame.setVisible(true);
+        startsSockets();
+    }
+
+    private void startsSockets() {
+        BrowserHandler browserHandler = new BrowserHandler(5557,false);
+        RunClient rc = new RunClient();
+        rc.conectarServidor("127.0.0.1");
+        rc.criarSocketCliente();
+        browserHandler.run();
     }
 
 
