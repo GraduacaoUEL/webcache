@@ -119,10 +119,12 @@ public class ServidorMestre implements Runnable {
                     if (mensagem[0].equals("IP")) {
                         System.out.println("Mensagem do Cliente " + countClient + ": " + mensagem[1]);
                         //hashTable.put(countClient, mensagem[1]);
+                        if(!listIP.contains(mensagem[1])){
                         listIP.add(mensagem[1]);
                         countClient++;
                         //System.out.println("Tabela HASH: " + hashTable);
                         System.out.println("Lista de IP's: " + listIP);
+                        }
                     }
                 }
 
