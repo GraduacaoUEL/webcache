@@ -6,6 +6,9 @@ package Webcache;
 
 import java.awt.BorderLayout;
 import java.awt.Checkbox;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -62,10 +65,14 @@ public class TelaPrincipal extends JPanel {
         @Override
         public void run() {
         BrowserHandler browserHandler = new BrowserHandler(5557,false);
-        RunClient rc = new RunClient();
+        RunClient rc;
+            try {
+                rc = new RunClient();
+            } catch (IOException ex) {
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            }
                 
-        rc.conectarServidor("127.0.0.1");
-        rc.criarSocketCliente();
+
 
         browserHandler.run();
         }
