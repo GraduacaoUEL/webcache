@@ -21,14 +21,11 @@ public class BrowserHandler {
     private static final int BUFFER_SIZE = 8192;
     private boolean useProxy;
     private ServerSocket serverSocket;
-    private Files gerenciadorDeArquivos;
-
 
     public BrowserHandler(int port, boolean proxy) {
         try {
             this.serverSocket = new ServerSocket(port);
             this.useProxy = proxy;
-            this.gerenciadorDeArquivos = new Files();
         } catch (IOException exception) {
             System.err.println("Browser Reader - constructor error");
             System.exit(-1);
@@ -92,7 +89,6 @@ public class BrowserHandler {
                     String[] requestHeader = request.get(i).split(": ");
                     connection.setRequestProperty(requestHeader[0], requestHeader[1]);
                 }
-                gerenciadorDeArquivos.SaveToFile(uri.toString(), "Ok");
                 connection.setRequestMethod(method);
                 connection.connect();
             } catch (MalformedURLException exception) {
@@ -104,6 +100,8 @@ public class BrowserHandler {
             }
 
         }
+        
+        
 
         void setProxy(String proxyName, String proxyPort) {
             System.setProperty("http.proxyHost", proxyName);
