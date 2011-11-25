@@ -81,8 +81,8 @@ public class BrowserHandler {
                 
                 if (useProxy == true) {
                     /* descomentar 1 e 2 usar o cache  da uel*/
-//  [1]                  setProxy("cache.uel.br","8080");
-//  [2]                  connection.setRequestProperty("Proxy-Authorization", "Basic " + userPass("200905600493","computador"));
+                  setProxy("cache.uel.br","8080");
+                  connection.setRequestProperty("Proxy-Authorization", "Basic " + userPass("200905600493","computador"));
                     /* descomentar 17 para usar proxy sem pass ou senha */
 // [17]                   setProxy("103.1.185.31","3128"); //proxy doidão da pqp
                     
