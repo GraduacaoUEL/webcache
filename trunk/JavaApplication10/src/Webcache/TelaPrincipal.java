@@ -17,6 +17,7 @@ public class TelaPrincipal extends JPanel {
     JFrame mainFrame;
     
     JPanel proxyPanel; 
+    Thread sockets;
 
     public void buildGUI()
     {
@@ -44,24 +45,32 @@ public class TelaPrincipal extends JPanel {
         proxyPanel.add(senha);
         proxyPanel.add(okButton);
         
+        sockets = new Thread(new Sockets());
+        sockets.start();
+                
         
- 
         mainFrame.getContentPane().add(BorderLayout.CENTER, proxyPanel);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         mainFrame.setSize(800,600);
         mainFrame.setVisible(true);
-        startsSockets();
+       
+
     }
 
-    private void startsSockets() {
+    public class Sockets implements Runnable{
+
+        @Override
+        public void run() {
         BrowserHandler browserHandler = new BrowserHandler(5557,false);
         RunClient rc = new RunClient();
+                
         rc.conectarServidor("127.0.0.1");
         rc.criarSocketCliente();
+
         browserHandler.run();
+        }
+        
     }
-
-
 
 
 
