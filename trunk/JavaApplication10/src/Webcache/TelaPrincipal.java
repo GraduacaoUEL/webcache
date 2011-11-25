@@ -64,7 +64,7 @@ public class TelaPrincipal extends JPanel {
 
         @Override
         public void run() {
-        BrowserHandler browserHandler = new BrowserHandler(5557,false);
+        BrowserHandler browserHandler = new BrowserHandler(5557,true);
         RunClient rc;
             try {
                 rc = new RunClient();
