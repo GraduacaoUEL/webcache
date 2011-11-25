@@ -21,12 +21,14 @@ public class BrowserHandler {
     private static final int BUFFER_SIZE = 8192;
     private boolean useProxy;
     private ServerSocket serverSocket;
+    private Files gerenciadorDeArquivos;
 
 
     public BrowserHandler(int port, boolean proxy) {
         try {
             this.serverSocket = new ServerSocket(port);
             this.useProxy = proxy;
+            this.gerenciadorDeArquivos = new Files();
         } catch (IOException exception) {
             System.err.println("Browser Reader - constructor error");
             System.exit(-1);
@@ -73,7 +75,7 @@ public class BrowserHandler {
                 String method = requestLine[0];
                 URI uri = new URI(requestLine[1]);
                 String version = requestLine[2];
-                System.out.println("Request [" + socket.getPort() + "] " + method + " " + uri + " " + version);
+               // System.out.println("Request [" + socket.getPort() + "] " + method + " " + uri + " " + version);
 
                 connection = (HttpURLConnection) uri.toURL().openConnection();
                 
@@ -90,6 +92,7 @@ public class BrowserHandler {
                     String[] requestHeader = request.get(i).split(": ");
                     connection.setRequestProperty(requestHeader[0], requestHeader[1]);
                 }
+                gerenciadorDeArquivos.SaveToFile(uri.toString(), "Ok");
                 connection.setRequestMethod(method);
                 connection.connect();
             } catch (MalformedURLException exception) {
@@ -121,7 +124,7 @@ public class BrowserHandler {
                 int contentLength = connection.getContentLength();
                 String transferEncoding = connection.getHeaderField("Transfer-Encoding");
                 boolean chunked = (transferEncoding != null && transferEncoding.equalsIgnoreCase("chunked"));
-                System.out.println("Response [" + socket.getPort() + "] " + responseCode + " " + responseMessage);
+               // System.out.println("Response [" + socket.getPort() + "] " + responseCode + " " + responseMessage);
 
                 String key;
                 requestWriter.writeUTF(connection.getHeaderField(0));
