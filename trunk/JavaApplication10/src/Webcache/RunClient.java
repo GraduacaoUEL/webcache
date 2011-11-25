@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sun.audio.AudioPlayer;
 
 /**
  *
@@ -38,7 +37,7 @@ public class RunClient {
     //Atributos para Transferência de Arquivo
     private Thread connectionFileClientClient_Thread;
     private String fileName;
-    private static String diretorio = "C:\\Users\\Ernesto\\Documents\\NetBeansProjects\\trunk\\JavaApplication10\\src\\Arquivo\\Webcache\\";
+    private static String diretorio = "C:\\Users\\Ernesto\\Documents\\NetBeansProjects\\trunk\\JavaApplication10\\src\\Arquivo\\";
 
     public static void main(String[] args) throws IOException {
         RunClient rc = new RunClient();
@@ -50,17 +49,19 @@ public class RunClient {
         connectionToMasterServer_Thread.start();
 
         //Ativa a parte que comunicação direta com outros clientes        
-        connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
+        /*connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
         connectionClientClient_Thread.start();
         
         //Ativa a conexão de Transferência de Arquivo
         connectionFileClientClient_Thread = new Thread(new connectionFileClientClient(5557));
         connectionFileClientClient_Thread.start();
-        
+        */
         //inicia a arraylist
         listaClientes = new ArrayList();
     
-        //startConnectionWithClient scwc = new startConnectionWithClient("127.0.0.1", 5556, "reg_alloc.pdf");
+        String[] listaArquivos = {"reg_alloc.pdf" , "Web_Cache_Distribuido.pdf"};
+        startConnectionWithClient scwc = new startConnectionWithClient("127.0.0.1", 5556, listaArquivos);
+       
     }
 
     //Realiza conexão com o Servidor Mestre
@@ -246,13 +247,13 @@ public class RunClient {
         private Thread temp;
         private String IPneighbor, NomeArq;
         private int Portneighbor;
-        private boolean endProcess;
+        //private boolean endProcess;
         
-        public startConnectionWithClient(String ipNeighbor, int portNeighbor, String nomeArquivo) {
+        public startConnectionWithClient(String ipNeighbor, int portNeighbor, String[] nomeArquivo) {
             IPneighbor = ipNeighbor;            
             Portneighbor = portNeighbor;
-            NomeArq = nomeArquivo;
-            endProcess = false;
+            //NomeArq = nomeArquivo;
+            //endProcess = false;
             try {
                 sockWithClient = new Socket(ipNeighbor, portNeighbor);
                 InputStreamReader streamReader = new InputStreamReader(sockWithClient.getInputStream());
@@ -261,44 +262,60 @@ public class RunClient {
                 System.out.println("Conexão com o Cliente estabelecida. Procurar arquivo nos vizinhos...");
                 temp = new Thread(new listen());
                 temp.start();
-                String sTemp = "NomeDoArquivo;" + nomeArquivo;
-                System.out.println(sTemp);
-                //tellTheNeighbor(sTemp);
-                writerWithClient.write(sTemp);
                 
-                while(endProcess==false) {}
-                
+                int i = nomeArquivo.length;
+                System.out.println("Tamanho do Vetor de Arquivos: "+i);
+                //while(nomeArquivo[i]!=null) {
+                for(i=0 ; i<nomeArquivo.length ; i++) {
+                    NomeArq = nomeArquivo[i];
+                    String sTemp = "NomeDoArquivo;" + nomeArquivo[i];
+
+                    //tellTheNeighbor(sTemp);
+                    writerWithClient.println(sTemp);
+                    writerWithClient.flush();
+
+                    System.out.println(sTemp);
+                    i++;
+                }
+                //while(endProcess==false) {}
+                System.out.println("Busca encerrada");
             } catch (IOException ex) {
                 System.out.println("FALHA AO TENTAR CONECTAR COM O CLIENTE");
-            }
-            
-            try {
-                temp.interrupt();
-                connectionToMasterServer_Thread.interrupt();
-                readerWithClient.close();
-                writerWithClient.close();
-                sockWithClient.close();
-            } catch (IOException ioE) {
-                ioE.printStackTrace();
-            }
+            } /*finally {
+                try {
+                    temp.interrupt();
+                    connectionToMasterServer_Thread.interrupt();
+                    readerWithClient.close();
+                    writerWithClient.close();
+                    sockWithClient.close();
+                } catch (IOException ioE) {
+                    ioE.printStackTrace();
+                }
+            }*/
         }
         
         private class listen implements Runnable{
             public void run() {
                 String message;
                 try {
-
                     //Resposta do Cliente/Vizinho
                     while ((message = readerWithClient.readLine()) != null) {
                         System.out.println(message);
                         if(message.equals("TenhoOArquivo")) {
                             startGetTransfer(IPneighbor, Portneighbor+1, NomeArq);
-                        } else if (message.equals("NaoTenhoOArquivo")) {
+                            System.out.println("O Viznho tem o arquivo");
                             
+                            //readerWithClient.close();
+                            //endProcess = true;
+                        } else {//if (message.equals("NaoTenhoOArquivo")) {
+                            System.out.println("O Vizinho não tem o arquivo");
+                            
+                            readerWithClient.close();
+                            //endProcess = true;                           
                         }
                     }
 
-                    try {
+                    /*try {
                         temp.interrupt();
                         connectionToMasterServer_Thread.interrupt();
                         readerWithClient.close();
@@ -307,7 +324,7 @@ public class RunClient {
                     } catch (IOException ioE) {
                         ioE.printStackTrace();
                     }
-                    endProcess = true;
+                    endProcess = true;*/
                 } catch (Exception ex) {
                     System.out.println("CONEXÃO COM O CLIENTE ENCERRADA");
                     ex.printStackTrace();
@@ -333,85 +350,7 @@ public class RunClient {
                 }
             }
         }
-        
-
-        
-
-    //private class startConnectionWithClient implements Runnable {
-
-        /*
-        //Construtor
-        public startConnectionWithClient(String ipServer, int portServer) {
-            try {
-                sockWithClient = new Socket(ipServer, portServer);
-                InputStreamReader streamReader = new InputStreamReader(sockWithClient.getInputStream());
-                readerWithClient = new BufferedReader(streamReader);
-                writerWithClient = new PrintWriter(sockWithClient.getOutputStream());
-                System.out.println("Conexão com o Cliente estabelecida...");
-
-                System.out.println("Procurar arquivo nos vizinhos");
-                
-                
-                
-            } catch (IOException ex) {
-                System.out.println("FALHA AO TENTAR CONECTAR COM O CLIENTE");
-                ex.printStackTrace();
-            }
-        }
-
-        //O que a Thread irá executar
-        public void run() {
-            String message;
-            try {
-
-                //Mensagem que vem do Servidor Mestre
-                while ((message = readerWithClient.readLine()) != null) {
-                    System.out.println(message);
-                }
-
-                try {
-                    connectionToMasterServer_Thread.interrupt();
-                    readerWithClient.close();
-                    writerWithClient.close();
-                    sockWithClient.close();
-                } catch (IOException ioE) {
-                    ioE.printStackTrace();
-                }
-            } catch (Exception ex) {
-                System.out.println("CONEXÃO COM O CLIENTE ENCERRADA");
-                ex.printStackTrace();
-                try {
-                    connectionToMasterServer_Thread.interrupt();
-                    readerWithClient.close();
-                    writerWithClient.close();
-                    sockWithClient.close();
-                } catch (IOException ioE) {
-                    ioE.printStackTrace();
-                }
-            } finally {
-                try {
-                    connectionToMasterServer_Thread.interrupt();
-                    readerWithClient.close();
-                    writerWithClient.close();
-                    sockWithClient.close();
-                } catch (IOException ioE) {
-                    ioE.printStackTrace();
-                }
-            }
-        }
-        
-        private void tellTheNeighbor(String message) {
-            Iterator it = clientOutputStreams.iterator();
-            while (it.hasNext()) {
-                try {
-                    PrintWriter writer = (PrintWriter) it.next();
-                    writer.println(message);
-                    writer.flush();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }*/
+     
         
     }//Fim do startConnectionWithClient
     
@@ -471,7 +410,7 @@ public class RunClient {
         // receive file
         byte[] mybytearray = new byte[filesize];
         InputStream is = getsock.getInputStream();
-        FileOutputStream fos = new FileOutputStream(diretorio + nomeArquivo);
+        FileOutputStream fos = new FileOutputStream(diretorio + "Copy-"+nomeArquivo);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         bytesRead = is.read(mybytearray, 0, mybytearray.length);
         current = bytesRead;
