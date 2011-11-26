@@ -21,6 +21,8 @@ public class Files {
     public void SaveToFile(String name,String dados)
     {
         String path = new String();
+        String arquivo = new String();
+        arquivo = separarNome(name);
         path = caminho(name);
         System.out.println(path);
         criarPasta(path);    
@@ -28,7 +30,7 @@ public class Files {
           PrintStream fileSaida;  
           try  
           {  
-               saida = new FileOutputStream(path + "index.html");  
+               saida = new FileOutputStream(path + arquivo);  
                fileSaida = new PrintStream(saida);  
                fileSaida.print(dados);  
                saida.close();
@@ -54,5 +56,11 @@ public class Files {
     {
                File file = new File(path);
                file.mkdirs();
+    }
+
+    public String separarNome(String str) {
+       String[] temp = str.split("/");
+        str = temp[temp.length - 1];
+        return str;
     }
 }

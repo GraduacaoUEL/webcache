@@ -48,6 +48,7 @@ public class BrowserHandler {
         private Socket socket;
         private HttpURLConnection connection;
         private boolean useProxy;
+        private String url; //gambi
 
         public Request(Socket socket, Boolean proxy) {
             this.socket = socket;
@@ -75,7 +76,7 @@ public class BrowserHandler {
                // System.out.println("Request [" + socket.getPort() + "] " + method + " " + uri + " " + version);
 
                 connection = (HttpURLConnection) uri.toURL().openConnection();
-                
+                url = uri.toURL().toString();
                 if (useProxy == true) {
                     /* descomentar 1 e 2 usar o cache  da uel*/
                   setProxy("cache.uel.br","8080");
