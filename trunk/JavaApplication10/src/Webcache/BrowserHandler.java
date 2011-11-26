@@ -12,7 +12,7 @@ import java.net.*;
 
 /**
  *
- * @author okamura
+ * @author Vinicius Tadeu, Ernesto, Hayato, Helio
  */
 public class BrowserHandler {
 
@@ -64,7 +64,7 @@ public class BrowserHandler {
         public void run() {
             readRequest();
             writeResponse();
- 
+
         }
 
         public void readRequest() {
@@ -80,19 +80,19 @@ public class BrowserHandler {
                 String method = requestLine[0];
                 URI uri = new URI(requestLine[1]);
                 String version = requestLine[2];
-               // System.out.println("Request [" + socket.getPort() + "] " + method + " " + uri + " " + version);
+                // System.out.println("Request [" + socket.getPort() + "] " + method + " " + uri + " " + version);
 
                 connection = (HttpURLConnection) uri.toURL().openConnection();
                 url = uri.toURL().toString();
                 if (useProxy == true) {
                     /* descomentar 1 e 2 usar o cache  da uel*/
-                  setProxy("cache.uel.br","8080");
-                  connection.setRequestProperty("Proxy-Authorization", "Basic " + userPass(usuario,senha));
+                    setProxy("cache.uel.br", "8080");
+                    connection.setRequestProperty("Proxy-Authorization", "Basic " + userPass(usuario, senha));
                     /* descomentar 17 para usar proxy sem pass ou senha */
 // [17]                   setProxy("103.1.185.31","3128"); //proxy doidão da pqp
-                    
+
                 }
-                
+
                 for (int i = 1; i < request.size(); i++) {
                     String[] requestHeader = request.get(i).split(": ");
                     connection.setRequestProperty(requestHeader[0], requestHeader[1]);
@@ -108,8 +108,6 @@ public class BrowserHandler {
             }
 
         }
-        
-        
 
         void setProxy(String proxyName, String proxyPort) {
             System.setProperty("http.proxyHost", proxyName);
@@ -130,7 +128,7 @@ public class BrowserHandler {
                 int contentLength = connection.getContentLength();
                 String transferEncoding = connection.getHeaderField("Transfer-Encoding");
                 boolean chunked = (transferEncoding != null && transferEncoding.equalsIgnoreCase("chunked"));
-               // System.out.println("Response [" + socket.getPort() + "] " + responseCode + " " + responseMessage);
+                // System.out.println("Response [" + socket.getPort() + "] " + responseCode + " " + responseMessage);
 
                 String key;
                 requestWriter.writeUTF(connection.getHeaderField(0));
@@ -158,7 +156,7 @@ public class BrowserHandler {
                     } else {
                         responseReader = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
                     }
-                   
+
                     int readBytes;
                     byte[] buffer = new byte[BUFFER_SIZE];
                     ar.criarPasta(ar.caminho(url));
@@ -169,7 +167,7 @@ public class BrowserHandler {
                         requestWriter.flush();
                     }
 
-                   
+
                     fileWriter.close();
                     responseReader.close();
                 }

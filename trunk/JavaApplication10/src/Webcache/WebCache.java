@@ -8,14 +8,14 @@ import java.io.IOException;
 
 /**
  *
- * @author Vinicius
+ * @author Vinicius Tadeu, Ernesto, Hayato, Helio
  */
 public class WebCache {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         TelaPrincipal tp = new TelaPrincipal();
         tp.buildGUI();
 //        Files fl = new Files();

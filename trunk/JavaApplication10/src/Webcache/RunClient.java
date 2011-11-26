@@ -5,7 +5,6 @@
 package Webcache;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.*;
 import java.net.InetAddress;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,7 +23,7 @@ import javax.swing.ScrollPaneConstants;
 
 /**
  *
- * @author Ernesto
+ * @author Vinicius Tadeu, Ernesto, Hayato, Helio
  */
 public class RunClient {
 
@@ -63,13 +61,13 @@ public class RunClient {
         RunClient rc = new RunClient();
     }
 
-    public RunClient() throws IOException{
-        
+    public RunClient() throws IOException {
+
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Monitoramento");
         frame.setResizable(false);
-        
+
         serverArea = new JTextArea(20, 25);
         serverArea.setLineWrap(true);
         serverArea.setWrapStyleWord(true);
@@ -78,8 +76,8 @@ public class RunClient {
         serverScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         serverScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         serverScroller.setAutoscrolls(true);
-        serverLabel = new JLabel("Comunicação com o Servidor");        
-        
+        serverLabel = new JLabel("Comunicação com o Servidor");
+
         clientArea = new JTextArea(20, 25);
         clientArea.setLineWrap(true);
         clientArea.setWrapStyleWord(true);
@@ -89,7 +87,7 @@ public class RunClient {
         clientScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         clientScroller.setAutoscrolls(true);
         clientLabel = new JLabel("Comunicação com Cliente");
-        
+
         buscaArea = new JTextArea(20, 25);
         buscaArea.setLineWrap(true);
         buscaArea.setWrapStyleWord(true);
@@ -99,7 +97,7 @@ public class RunClient {
         buscaScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         buscaScroller.setAutoscrolls(true);
         buscaLabel = new JLabel("Buscar Arquivo");
-        
+
         transferArea = new JTextArea(20, 25);
         transferArea.setLineWrap(true);
         transferArea.setWrapStyleWord(true);
@@ -109,7 +107,7 @@ public class RunClient {
         transferScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         transferScroller.setAutoscrolls(true);
         transferLabel = new JLabel("Transferência de Arquivos");
-        
+
         receberArea = new JTextArea(20, 25);
         receberArea.setLineWrap(true);
         receberArea.setWrapStyleWord(true);
@@ -119,49 +117,49 @@ public class RunClient {
         receberScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         receberScroller.setAutoscrolls(true);
         receberLabel = new JLabel("Download de Arquivos");
-        
-        panelLabel = new JPanel(new GridLayout(5,1,1,1));
-        panelLabel.add(serverLabel);        
-        panelLabel.add(clientLabel);        
-        panelLabel.add(buscaLabel);        
-        panelLabel.add(transferLabel);        
-        panelLabel.add(receberLabel);        
-        
+
+        panelLabel = new JPanel(new GridLayout(5, 1, 1, 1));
+        panelLabel.add(serverLabel);
+        panelLabel.add(clientLabel);
+        panelLabel.add(buscaLabel);
+        panelLabel.add(transferLabel);
+        panelLabel.add(receberLabel);
+
         panelArea = new JPanel(new GridLayout(5, 1, 1, 1));
         panelArea.add(serverScroller);
         panelArea.add(clientScroller);
         panelArea.add(buscaScroller);
         panelArea.add(transferScroller);
         panelArea.add(receberScroller);
-        
+
         frame.getContentPane().add(BorderLayout.WEST, panelLabel);
         frame.getContentPane().add(BorderLayout.CENTER, panelArea);
         frame.setSize(1200, 800);
         frame.setVisible(true);
-        
+
         //Ativa a parte de conexão com o Servidor Mestre
         connectionToMasterServer_Thread = new Thread(new connectionToMasterServer(ipServidorMestre, portaServidorMestre));
         connectionToMasterServer_Thread.start();
-        
-        
-        
-        
+
+
+
+
         //Ativa a parte que comunicação direta com outros clientes        
         connectionClientClient_Thread = new Thread(new connectionClientClient(portaComunicacaoClienteCliente));
         connectionClientClient_Thread.start();
-        
+
         //Ativa a conexão de Transferência de Arquivo
         connectionFileClientClient_Thread = new Thread(new connectionFileClientClient(portaFileTransfer));
         connectionFileClientClient_Thread.start();
-        
+
         //inicia a arraylist
         listaClientes = new ArrayList();
-    
-        
-        
+
+
+
         /*EXECUTAR SEPARADO PARA TESTAR - COMENTAR A LINHA 58 A 63*/
         String[] listaArquivos = {"reg_alloc.pdf", "Web_Cache_Distribuido.pdf", "Gramatica C.docx", "WebCacheDistribuido.rar"};
-        
+
         System.out.println("Quantidade de Arquivos a ser resgatados: " + listaArquivos.length);
         //connectionWithClient_Thread = new Thread(new startConnectionWithClient("127.0.0.1", portaComunicacaoClienteCliente, listaArquivos));
         //connectionWithClient_Thread.start();       
@@ -303,11 +301,11 @@ public class RunClient {
                     //Se o cliente enviar alguma mensagem
                     while ((message = readerClientClient.readLine()) != null) {
                         mensagem = message.split(";");
-                        
+
                         if (mensagem[0].equals("NomeDoArquivo")) {
                             fileName = mensagem[1];
                             File myFile;
-                            if( (myFile = new File(diretorio + fileName))!=null ){
+                            if ((myFile = new File(diretorio + fileName)) != null) {
                                 tellTheNeighbor("TenhoOArquivo");
                                 System.out.println("Tenho o Arquivo: " + fileName);
                                 clientArea.append(sockClientClient.getInetAddress() + ", tenho o Arquivo " + fileName + ". \n");
@@ -315,7 +313,7 @@ public class RunClient {
                                 tellTheNeighbor("NaoTenhoOArquivo");
                                 System.out.println("Não tenho o Arquivo: " + fileName);
                                 clientArea.append(sockClientClient.getInetAddress() + ", não tenho o Arquivo " + fileName + ". \n");
-                            }                            
+                            }
                         }
                     }
 
@@ -352,7 +350,7 @@ public class RunClient {
             }
         }
     }//Fim do connectionClientClient
-    
+
     //Conexão entre Cliente-Cliente (Procura)
     private class startConnectionWithClient implements Runnable {
 
@@ -393,14 +391,14 @@ public class RunClient {
                         System.out.println(message);
                         if (message.equals("TenhoOArquivo")) {
                             System.out.println("O Viznho tem o arquivo");
-                            buscaArea.append("O " +sockWithClient.getInetAddress()+" tem o Arquivo " + NomeArq + ". \n");
+                            buscaArea.append("O " + sockWithClient.getInetAddress() + " tem o Arquivo " + NomeArq + ". \n");
                             tempListen = new Thread(new startGetTransfer(IPneighbor, portaFileTransfer, NomeArq));
                             tempListen.start();
                             System.out.println("Transferencia terminada");
                             endProcess = true;
                         } else if (message.equals("NaoTenhoOArquivo")) {
                             System.out.println("O Vizinho não tem o arquivo");
-                            buscaArea.append("O " +sockWithClient.getInetAddress()+" não tem o Arquivo " + NomeArq + ". \n");
+                            buscaArea.append("O " + sockWithClient.getInetAddress() + " não tem o Arquivo " + NomeArq + ". \n");
                             endProcess = true;
                         }
                     }
@@ -436,7 +434,7 @@ public class RunClient {
                 System.out.println("Leitura do nome do arquivo: " + arqNome[i]);
                 NomeArq = arqNome[i];
 
-                buscaArea.append("Procurando arquivo "+ NomeArq+" no "+sockWithClient.getInetAddress()+". \n");
+                buscaArea.append("Procurando arquivo " + NomeArq + " no " + sockWithClient.getInetAddress() + ". \n");
                 String sTemp = "NomeDoArquivo;" + NomeArq;
 
                 writerWithClient.println(sTemp);
@@ -449,20 +447,20 @@ public class RunClient {
                 }
                 endProcess = false;
                 System.out.println("Busca encerrada");
-                buscaArea.append("Busca encerrada com "+sockWithClient.getInetAddress()+". \n");
+                buscaArea.append("Busca encerrada com " + sockWithClient.getInetAddress() + ". \n");
             }
         }
     }//Fim do startConnectionWithClient
-    
+
     //Faz a transferência do Arquivo para o Vizinho
     private class connectionFileClientClient implements Runnable {
-        
+
         ServerSocket servsock;
-        
+
         public connectionFileClientClient(int Port) throws IOException {
-            servsock = new ServerSocket(Port);            
+            servsock = new ServerSocket(Port);
         }
-        
+
         public void runTransfer() throws IOException {
             while (true) {
                 System.out.println("Waiting...");
@@ -472,9 +470,9 @@ public class RunClient {
                 transferArea.append("Conexão aceita com " + clientsock + ". \n");
 
                 // sendfile
-                System.out.println("Diretorio: " +diretorio+fileName);
+                System.out.println("Diretorio: " + diretorio + fileName);
                 System.out.println("Nome do Arquivo: " + fileName);
-                transferArea.append("Transferindo o arquivo " + fileName + " para "+ clientsock+". \n");
+                transferArea.append("Transferindo o arquivo " + fileName + " para " + clientsock + ". \n");
                 File myFile = new File(diretorio + fileName);
                 byte[] mybytearray = new byte[(int) myFile.length()];
                 FileInputStream fis = new FileInputStream(myFile);
@@ -487,7 +485,7 @@ public class RunClient {
                 clientsock.close();
             }
         }
-        
+
         public void run() {
             try {
                 runTransfer();
@@ -496,12 +494,13 @@ public class RunClient {
             }
         }
     }
-   
+
     //Método para pegar um arquivo do vizinho
     private class startGetTransfer implements Runnable {
 
         private String ip, nomeArquivo;
         private int port;
+
         public startGetTransfer(String ipTransfer, int portTransfer, String nomeArquivoTransfer) {
             ip = ipTransfer;
             port = portTransfer;
@@ -523,7 +522,7 @@ public class RunClient {
                 // receive file
                 byte[] mybytearray = new byte[filesize];
                 InputStream is = getsock.getInputStream();
-                FileOutputStream fos = new FileOutputStream(diretorio + "Copy-" + nomeArquivo);                
+                FileOutputStream fos = new FileOutputStream(diretorio + "Copy-" + nomeArquivo);
                 BufferedOutputStream bos = new BufferedOutputStream(fos);
                 bytesRead = is.read(mybytearray, 0, mybytearray.length);
                 current = bytesRead;
