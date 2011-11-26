@@ -4,6 +4,7 @@
  */
 package Webcache;
 
+import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,6 +16,11 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 /**
  *
@@ -25,19 +31,41 @@ public class ServidorMestre implements Runnable {
     private ArrayList clientOutputStreams;
     private ServerSocket serverSocket;
     private Thread t;
-    //private Map hashTable;
     private ArrayList listIP;
     private int countClient;
+    
+    private JFrame frame;
+    private JPanel panel;
+    private JTextArea textArea;
 
     public static void main(String[] args) {
-
         Thread sm = new Thread(new ServidorMestre(5555));
         sm.start();
     }
 
     //Construtor - Ativa o Socket para a comunicação com os clientes
     public ServidorMestre(int port) {
-        //hashTable = new Hashtable();
+        
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setTitle("SERVIDOR");
+        frame.setResizable(false);
+        
+        textArea = new JTextArea(40, 25);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        JScrollPane qScroller = new JScrollPane(textArea);
+        qScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        qScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        qScroller.setAutoscrolls(true);
+        
+        panel = new JPanel();
+        panel.add(qScroller);
+        frame.getContentPane().add(BorderLayout.CENTER, panel);
+        frame.setSize(300, 650);
+        frame.setVisible(true);
+        
         listIP = new ArrayList();
         countClient = 0;
         try {
@@ -47,11 +75,13 @@ public class ServidorMestre implements Runnable {
             String ipText = String.valueOf(InetAddress.getLocalHost().getHostAddress());
             ipText = ipText.replace("/", "");
             System.out.println("IP server: " + ipText);
-            //hashTable.put(countClient, ipText);
             listIP.add(ipText);
             countClient++;
 
             System.out.println("Socket do Servidor ativado");
+            textArea.append("Socket do Servidor ativado \n");
+            textArea.append("IP server: "+ ipText+ "\n \n");
+            
         } catch (IOException ioE) {
             System.out.println("FALHA AO CRIAR O SERVER SOCKET");
             ioE.printStackTrace();
@@ -71,6 +101,8 @@ public class ServidorMestre implements Runnable {
                 t.start();
                 
                 tellEveryone(listaClientes(listIP));
+                System.out.println("Lista de IP: " + listIP);
+                textArea.append("Lista de IP: "+ listIP +"\n");
             }
 
         } catch (Exception ex) {
@@ -118,12 +150,10 @@ public class ServidorMestre implements Runnable {
 
                     if (mensagem[0].equals("IP")) {
                         System.out.println("Mensagem do Cliente " + countClient + ": " + mensagem[1]);
-                        //hashTable.put(countClient, mensagem[1]);
                         if(!listIP.contains(mensagem[1])){
-                        listIP.add(mensagem[1]);
-                        countClient++;
-                        //System.out.println("Tabela HASH: " + hashTable);
-                        System.out.println("Lista de IP's: " + listIP);
+                            listIP.add(mensagem[1]);
+                            countClient++;
+                            System.out.println("Lista de IP's: " + listIP);                        
                         }
                     }
                 }
