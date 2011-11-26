@@ -21,11 +21,14 @@ public class BrowserHandler {
     private static final int BUFFER_SIZE = 8192;
     private boolean useProxy;
     private ServerSocket serverSocket;
+    private static String usuario, senha;
 
-    public BrowserHandler(int port, boolean proxy) {
+    public BrowserHandler(int port, boolean proxy, String user, String password) {
         try {
             this.serverSocket = new ServerSocket(port);
             this.useProxy = proxy;
+            this.usuario = user;
+            this.senha = password;
         } catch (IOException exception) {
             System.err.println("Browser Reader - constructor error");
             System.exit(-1);
@@ -84,7 +87,7 @@ public class BrowserHandler {
                 if (useProxy == true) {
                     /* descomentar 1 e 2 usar o cache  da uel*/
                   setProxy("cache.uel.br","8080");
-                  connection.setRequestProperty("Proxy-Authorization", "Basic " + userPass("200905600493","computador"));
+                  connection.setRequestProperty("Proxy-Authorization", "Basic " + userPass(usuario,senha));
                     /* descomentar 17 para usar proxy sem pass ou senha */
 // [17]                   setProxy("103.1.185.31","3128"); //proxy doidão da pqp
                     
