@@ -28,4 +28,9 @@ public class TabelaLocal {
     {
         return tabela.contains(ar);
     }
+    
+    public ArrayList getTabela()
+    {
+        return tabela;
+    }
 }

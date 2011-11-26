@@ -5,6 +5,7 @@
 package Hash;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -26,5 +27,14 @@ public class TabelaGeral {
     public boolean verificar(ArquivoRemoto ar)
     {
         return tabela.contains(ar);
+    }
+    
+    public void adicionarTabela(ArrayList tab)
+    {
+        Iterator it = tab.iterator();
+        while(it.hasNext())
+        {
+            add((ArquivoRemoto) it.next());
+        }
     }
 }
