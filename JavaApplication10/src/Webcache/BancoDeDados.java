@@ -10,23 +10,21 @@ import java.util.Iterator;
 
 /**
  *
- * @author Vinicius
+ * @author Vinicius Tadeu, Ernesto, Hayato, Helio
  */
 public class BancoDeDados {
 
     private ArrayList memoriaConexoes;
     private int tamanhoMemoria;
-    
 
     public void BancoDeDados() {
         inicializaMemoriaConexoes();
     }
 
-    public void escreverTabela(ArrayList lista)
-    {
+    public void escreverTabela(ArrayList lista) {
         //lista.
     }
-    
+
     public void inicializaMemoriaConexoes() {
         String str = new String();
 
@@ -74,12 +72,12 @@ public class BancoDeDados {
             out.write(buffer);
             out.newLine();
             Iterator it = memoriaConexoes.iterator();
-                while(it.hasNext()) {
-                    buffer = "";
-                    buffer += it.next();
-                    out.write(buffer);
-                    out.newLine();
-                }
+            while (it.hasNext()) {
+                buffer = "";
+                buffer += it.next();
+                out.write(buffer);
+                out.newLine();
+            }
             out.write(novoIP);
             out.newLine();
 
@@ -97,24 +95,23 @@ public class BancoDeDados {
         BufferedWriter out;
         RandomAccessFile file;
         try {
-             file = new RandomAccessFile("src\\Webcache\\conexoes", "rw");
+            file = new RandomAccessFile("src\\Webcache\\conexoes", "rw");
             file.setLength(0);
             file.close();
-            
+
             out = new BufferedWriter(new FileWriter("src\\Webcache\\conexoes"));
-        out.write("4");
-        out.newLine();
-        out.write("127.0.0.1");
-        out.newLine();
-        out.write("127.0.0.1");
-        out.newLine();
-        out.write("127.0.0.1");
-        out.newLine();
-        out.write("127.0.0.1");
-        out.newLine();
-        out.close();
+            out.write("4");
+            out.newLine();
+            out.write("127.0.0.1");
+            out.newLine();
+            out.write("127.0.0.1");
+            out.newLine();
+            out.write("127.0.0.1");
+            out.newLine();
+            out.write("127.0.0.1");
+            out.newLine();
+            out.close();
         } catch (IOException ex) {
-           
         }
 
     }
@@ -122,7 +119,7 @@ public class BancoDeDados {
     public static void main(String[] args) throws IOException {
         BancoDeDados bd = new BancoDeDados();
         bd.inicializaMemoriaConexoes();
-       // bd.ResetarBanco();
+        // bd.ResetarBanco();
         bd.escreveNoArquivo("127.0.0.1");
     }
 }

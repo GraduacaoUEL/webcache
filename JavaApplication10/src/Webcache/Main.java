@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author Vinicius
+ * @author Vinicius Tadeu, Ernesto, Hayato, Helio
  */
 public class Main {
 

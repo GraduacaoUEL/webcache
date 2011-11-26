@@ -15,7 +15,7 @@ import javax.swing.*;
 
 /**
  *
- * @author Vinicius
+ * @author Vinicius Tadeu, Ernesto, Hayato, Helio
  */
 public class TelaPrincipal extends JPanel {
 
@@ -37,7 +37,7 @@ public class TelaPrincipal extends JPanel {
         senha = new JTextField(20);
         proxyCheckBox = new Checkbox("Usar Proxy", false);
         okButton = new JButton("Confirmar");
-        
+
         proxyCheckBox.setBounds(150, 10, 50, 30);
         usuario.setBounds(150, 30, 50, 30);
         senha.setBounds(150, 40, 50, 30);
@@ -50,7 +50,7 @@ public class TelaPrincipal extends JPanel {
         proxyPanel.add(usuario);
         proxyPanel.add(senha);
         proxyPanel.add(okButton);
-        
+
         okButton.addActionListener(new okButtonListener());
 
         mainFrame.getContentPane().add(BorderLayout.CENTER, proxyPanel);
@@ -58,11 +58,10 @@ public class TelaPrincipal extends JPanel {
         mainFrame.setSize(300, 200);
         mainFrame.setVisible(true);
     }
-    
-    private class okButtonListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent event)
-        {
+
+    private class okButtonListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent event) {
             sockets = new Thread(new Sockets());
             sockets.start();
             mainFrame.setVisible(false);
@@ -70,11 +69,10 @@ public class TelaPrincipal extends JPanel {
     }
 
     public class Sockets implements Runnable {
-        
 
         @Override
         public void run() {
-            
+
             BrowserHandler browserHandler = new BrowserHandler(5558, proxyCheckBox.getState(), usuario.getText(), senha.getText());
             RunClient rc;
             try {

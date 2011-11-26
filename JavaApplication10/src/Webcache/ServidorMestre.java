@@ -13,9 +13,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,7 +22,7 @@ import javax.swing.ScrollPaneConstants;
 
 /**
  *
- * @author Ernesto
+ * @author Vinicius Tadeu, Ernesto, Hayato, Helio
  */
 public class ServidorMestre implements Runnable {
 
@@ -33,7 +31,6 @@ public class ServidorMestre implements Runnable {
     private Thread t;
     private ArrayList listIP;
     private int countClient;
-    
     private JFrame frame;
     private JPanel panel;
     private JTextArea textArea;
@@ -45,12 +42,12 @@ public class ServidorMestre implements Runnable {
 
     //Construtor - Ativa o Socket para a comunicação com os clientes
     public ServidorMestre(int port) {
-        
+
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("SERVIDOR");
         frame.setResizable(false);
-        
+
         textArea = new JTextArea(40, 25);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
@@ -59,13 +56,13 @@ public class ServidorMestre implements Runnable {
         qScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         qScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         qScroller.setAutoscrolls(true);
-        
+
         panel = new JPanel();
         panel.add(qScroller);
         frame.getContentPane().add(BorderLayout.CENTER, panel);
         frame.setSize(300, 650);
         frame.setVisible(true);
-        
+
         listIP = new ArrayList();
         countClient = 0;
         try {
@@ -80,8 +77,8 @@ public class ServidorMestre implements Runnable {
 
             System.out.println("Socket do Servidor ativado");
             textArea.append("Socket do Servidor ativado \n");
-            textArea.append("IP server: "+ ipText+ "\n \n");
-            
+            textArea.append("IP server: " + ipText + "\n \n");
+
         } catch (IOException ioE) {
             System.out.println("FALHA AO CRIAR O SERVER SOCKET");
             ioE.printStackTrace();
@@ -99,10 +96,10 @@ public class ServidorMestre implements Runnable {
                 clientOutputStreams.add(writer);
                 t = new Thread(new ClientHandler(clientSocket));
                 t.start();
-                
+
                 tellEveryone(listaClientes(listIP));
                 System.out.println("Lista de IP: " + listIP);
-                textArea.append("Lista de IP: "+ listIP +"\n");
+                textArea.append("Lista de IP: " + listIP + "\n");
             }
 
         } catch (Exception ex) {
@@ -115,9 +112,8 @@ public class ServidorMestre implements Runnable {
         String str = "";
         str += "IP;";
         Iterator it = list.iterator();
-        while(it.hasNext())
-        {
-            str += it.next() + ";"; 
+        while (it.hasNext()) {
+            str += it.next() + ";";
         }
         return str;
     }
@@ -150,10 +146,10 @@ public class ServidorMestre implements Runnable {
 
                     if (mensagem[0].equals("IP")) {
                         System.out.println("Mensagem do Cliente " + countClient + ": " + mensagem[1]);
-                        if(!listIP.contains(mensagem[1])){
+                        if (!listIP.contains(mensagem[1])) {
                             listIP.add(mensagem[1]);
                             countClient++;
-                            System.out.println("Lista de IP's: " + listIP);                        
+                            System.out.println("Lista de IP's: " + listIP);
                         }
                     }
                 }
