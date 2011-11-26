@@ -24,6 +24,7 @@ public class RunClient {
     private PrintWriter writerMasterServer;
     private Socket sockMasterServer;
     private BufferedReader readerMasterServer;
+    private static int portaServidorMestre = 5555;
     
     //Atributos para ativa o Socket de comunicação com outros clientes
     private ServerSocket connectionClientClient_Socket;
@@ -32,12 +33,14 @@ public class RunClient {
     private Socket sockWithClient;
     private BufferedReader readerWithClient;
     private PrintWriter writerWithClient;
-        private ArrayList listaClientes;
+    private ArrayList listaClientes;
+    private static int portaComunicacaoClienteCliente = 5556;
     
     //Atributos para Transferência de Arquivo
     private Thread connectionFileClientClient_Thread;
     private String fileName;
     private static String diretorio = "C:\\Users\\Ernesto\\Documents\\NetBeansProjects\\trunk\\JavaApplication10\\src\\Arquivo\\";
+    private static int portaFileTransfer = 5557;
 
     public static void main(String[] args) throws IOException {
         RunClient rc = new RunClient();
@@ -45,23 +48,31 @@ public class RunClient {
 
     public RunClient() throws IOException{
         //Ativa a parte de conexão com o Servidor Mestre
-        connectionToMasterServer_Thread = new Thread(new connectionToMasterServer("127.0.0.1", 5555));
+        connectionToMasterServer_Thread = new Thread(new connectionToMasterServer("127.0.0.1", portaServidorMestre));
         connectionToMasterServer_Thread.start();
-
+        
+        
+        
+        
         //Ativa a parte que comunicação direta com outros clientes        
-        /*connectionClientClient_Thread = new Thread(new connectionClientClient(5556));
+        connectionClientClient_Thread = new Thread(new connectionClientClient(portaComunicacaoClienteCliente));
         connectionClientClient_Thread.start();
         
         //Ativa a conexão de Transferência de Arquivo
-        connectionFileClientClient_Thread = new Thread(new connectionFileClientClient(5557));
+        connectionFileClientClient_Thread = new Thread(new connectionFileClientClient(portaFileTransfer));
         connectionFileClientClient_Thread.start();
-        */
+        
         //inicia a arraylist
         listaClientes = new ArrayList();
     
-        String[] listaArquivos = {"reg_alloc.pdf" , "Web_Cache_Distribuido.pdf"};
-        startConnectionWithClient scwc = new startConnectionWithClient("127.0.0.1", 5556, listaArquivos);
-       
+        
+        
+        /*EXECUTAR SEPARADO PARA TESTAR - COMENTAR A LINHA 58 A 63*/
+        String[] listaArquivos = {"reg_alloc.pdf", "Web_Cache_Distribuido.pdf", "Gramatica C.docx", "WebCacheDistribuido.rar"};
+        
+        System.out.println("Quantidade de Arquivos a ser resgatados: " + listaArquivos.length);
+        connectionWithClient_Thread = new Thread(new startConnectionWithClient("127.0.0.1", portaComunicacaoClienteCliente, listaArquivos));
+        connectionWithClient_Thread.start();       
     }
 
     //Realiza conexão com o Servidor Mestre
@@ -107,7 +118,7 @@ public class RunClient {
                             i++;
                         }
                     }
-                    System.out.println("ok");
+                    System.out.println("Lista de Clientes atualizado");
                 }
                 try {
                     connectionToMasterServer_Thread.interrupt();
@@ -202,8 +213,10 @@ public class RunClient {
                             File myFile;
                             if( (myFile = new File(diretorio + fileName))!=null ){
                                 tellTheNeighbor("TenhoOArquivo");
+                                System.out.println("Tenho o Arquivo: " + fileName);
                             } else {
                                 tellTheNeighbor("NaoTenhoOArquivo");
+                                System.out.println("Não tenho o Arquivo: " + fileName);
                             }                            
                         }
                     }
@@ -243,91 +256,56 @@ public class RunClient {
     }//Fim do connectionClientClient
     
     //Conexão entre Cliente-Cliente (Procura)
-    private class startConnectionWithClient {
+    private class startConnectionWithClient implements Runnable {
+
         private Thread temp;
         private String IPneighbor, NomeArq;
-        private int Portneighbor;
-        //private boolean endProcess;
-        
+        private String[] arqNome;
+        private boolean endProcess;
+
         public startConnectionWithClient(String ipNeighbor, int portNeighbor, String[] nomeArquivo) {
-            IPneighbor = ipNeighbor;            
-            Portneighbor = portNeighbor;
-            //NomeArq = nomeArquivo;
-            //endProcess = false;
+            IPneighbor = ipNeighbor;
+            arqNome = nomeArquivo;
+            endProcess = false;
             try {
                 sockWithClient = new Socket(ipNeighbor, portNeighbor);
                 InputStreamReader streamReader = new InputStreamReader(sockWithClient.getInputStream());
                 readerWithClient = new BufferedReader(streamReader);
                 writerWithClient = new PrintWriter(sockWithClient.getOutputStream());
                 System.out.println("Conexão com o Cliente estabelecida. Procurar arquivo nos vizinhos...");
+
                 temp = new Thread(new listen());
                 temp.start();
-                
-                int i = nomeArquivo.length;
-                System.out.println("Tamanho do Vetor de Arquivos: "+i);
-                //while(nomeArquivo[i]!=null) {
-                for(i=0 ; i<nomeArquivo.length ; i++) {
-                    NomeArq = nomeArquivo[i];
-                    String sTemp = "NomeDoArquivo;" + nomeArquivo[i];
 
-                    //tellTheNeighbor(sTemp);
-                    writerWithClient.println(sTemp);
-                    writerWithClient.flush();
-
-                    System.out.println(sTemp);
-                    i++;
-                }
-                //while(endProcess==false) {}
-                System.out.println("Busca encerrada");
             } catch (IOException ex) {
                 System.out.println("FALHA AO TENTAR CONECTAR COM O CLIENTE");
-            } /*finally {
-                try {
-                    temp.interrupt();
-                    connectionToMasterServer_Thread.interrupt();
-                    readerWithClient.close();
-                    writerWithClient.close();
-                    sockWithClient.close();
-                } catch (IOException ioE) {
-                    ioE.printStackTrace();
-                }
-            }*/
+            }
         }
-        
-        private class listen implements Runnable{
+
+        private class listen implements Runnable {
+
             public void run() {
                 String message;
+                Thread tempListen;
+
                 try {
                     //Resposta do Cliente/Vizinho
                     while ((message = readerWithClient.readLine()) != null) {
                         System.out.println(message);
-                        if(message.equals("TenhoOArquivo")) {
-                            startGetTransfer(IPneighbor, Portneighbor+1, NomeArq);
+                        if (message.equals("TenhoOArquivo")) {
                             System.out.println("O Viznho tem o arquivo");
-                            
-                            //readerWithClient.close();
-                            //endProcess = true;
-                        } else {//if (message.equals("NaoTenhoOArquivo")) {
+                            tempListen = new Thread(new startGetTransfer(IPneighbor, portaFileTransfer, NomeArq));
+                            tempListen.start();
+                            System.out.println("Transferencia terminada");
+                            endProcess = true;
+                        } else if (message.equals("NaoTenhoOArquivo")) {
                             System.out.println("O Vizinho não tem o arquivo");
-                            
-                            readerWithClient.close();
-                            //endProcess = true;                           
+                            endProcess = true;
                         }
                     }
 
-                    /*try {
-                        temp.interrupt();
-                        connectionToMasterServer_Thread.interrupt();
-                        readerWithClient.close();
-                        writerWithClient.close();
-                        sockWithClient.close();
-                    } catch (IOException ioE) {
-                        ioE.printStackTrace();
-                    }
-                    endProcess = true;*/
                 } catch (Exception ex) {
                     System.out.println("CONEXÃO COM O CLIENTE ENCERRADA");
-                    ex.printStackTrace();
                     try {
                         temp.interrupt();
                         connectionToMasterServer_Thread.interrupt();
@@ -350,8 +328,27 @@ public class RunClient {
                 }
             }
         }
-     
-        
+
+        public void run() {
+
+            for (int i = 0; i < arqNome.length; i++) {
+                System.out.println("Leitura do nome do arquivo: " + arqNome[i]);
+                NomeArq = arqNome[i];
+
+                String sTemp = "NomeDoArquivo;" + NomeArq;
+
+                writerWithClient.println(sTemp);
+                writerWithClient.flush();
+
+                System.out.println(sTemp);
+
+                while (endProcess == false) {
+                    //System.out.print(".");
+                }
+                endProcess = false;
+                System.out.println("Busca encerrada");
+            }
+        }
     }//Fim do startConnectionWithClient
     
     //Faz a transferência do Arquivo para o Vizinho
@@ -396,40 +393,53 @@ public class RunClient {
     }
    
     //Método para pegar um arquivo do vizinho
-    private void startGetTransfer(String ip, int port, String nomeArquivo) throws IOException {
+    private class startGetTransfer implements Runnable {
 
-        int filesize = 6022386; // filesize temporary hardcoded
+        private String ip, nomeArquivo;
+        private int port;
+        public startGetTransfer(String ipTransfer, int portTransfer, String nomeArquivoTransfer) {
+            ip = ipTransfer;
+            port = portTransfer;
+            nomeArquivo = nomeArquivoTransfer;
+        }
 
-        long start = System.currentTimeMillis();
-        int bytesRead;
-        int current = 0;
-        // localhost for testing
-        Socket getsock = new Socket(ip, port);
-        System.out.println("Connecting...");
+        public void run() {
+            try {
+                int filesize = 6022386; // filesize temporary hardcoded
 
-        // receive file
-        byte[] mybytearray = new byte[filesize];
-        InputStream is = getsock.getInputStream();
-        FileOutputStream fos = new FileOutputStream(diretorio + "Copy-"+nomeArquivo);
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        bytesRead = is.read(mybytearray, 0, mybytearray.length);
-        current = bytesRead;
+                long start = System.currentTimeMillis();
+                int bytesRead;
+                int current = 0;
+                // localhost for testing
+                Socket getsock = new Socket(ip, port);
+                System.out.println("Connecting...");
 
-        // thanks to A. Cádiz for the bug fix
-        do {
-            bytesRead =
-                    is.read(mybytearray, current, (mybytearray.length - current));
-            if (bytesRead >= 0) {
-                current += bytesRead;
+                // receive file
+                byte[] mybytearray = new byte[filesize];
+                InputStream is = getsock.getInputStream();
+                FileOutputStream fos = new FileOutputStream(diretorio + "Copy-" + nomeArquivo);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                bytesRead = is.read(mybytearray, 0, mybytearray.length);
+                current = bytesRead;
+
+                // thanks to A. Cádiz for the bug fix
+                do {
+                    bytesRead =
+                            is.read(mybytearray, current, (mybytearray.length - current));
+                    if (bytesRead >= 0) {
+                        current += bytesRead;
+                    }
+                } while (bytesRead > -1);
+
+                bos.write(mybytearray, 0, current);
+                bos.flush();
+                long end = System.currentTimeMillis();
+                System.out.println("Arquivo resgatado");
+                System.out.println(end - start);
+                bos.close();
+                getsock.close();
+            } catch (IOException ioe) {
             }
-        } while (bytesRead > -1);
-
-        bos.write(mybytearray, 0, current);
-        bos.flush();
-        long end = System.currentTimeMillis();
-        System.out.println("Arquivo resgatado");
-        System.out.println(end - start);
-        bos.close();
-        getsock.close();
+        }
     }
 }
