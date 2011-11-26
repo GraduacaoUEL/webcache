@@ -12,21 +12,27 @@ import java.util.Iterator;
  * @author helioalb
  */
 public class TabelaGeral {
-        private ArrayList tabela;
+        private ArrayList tabelaIndice;
+        private ArrayList tabelaGeral;
     
     void TabelaGeral()
     {
-       tabela = new ArrayList();
+       tabelaGeral = new ArrayList();
+       tabelaIndice = new ArrayList();
     }
     
     public void add(ArquivoRemoto ar)
     {
-        tabela.add(ar);
+        ArquivoIndice ai = new ArquivoIndice();
+        ai.setIp(ar.getIp());
+        ai.setUrl(ar.getUrl());
+        tabelaGeral.add(ar);
+        tabelaIndice.add(ai);
     }
     
-    public boolean verificar(ArquivoRemoto ar)
+    public boolean verificar(ArquivoIndice ar)
     {
-        return tabela.contains(ar);
+        return tabelaIndice.contains(ar);
     }
     
     public void adicionarTabela(ArrayList tab)
