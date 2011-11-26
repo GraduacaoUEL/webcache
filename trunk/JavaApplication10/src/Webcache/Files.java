@@ -6,8 +6,10 @@ package Webcache;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  *
@@ -21,25 +23,36 @@ public class Files {
         String path = new String();
         path = caminho(name);
         System.out.println(path);
-        File file = new File(path +"\\test.html");
-
-        try {
-            file.mkdirs();
-            file.createNewFile();
-            BufferedWriter out = new BufferedWriter(new FileWriter(file));
-            out.write(dados);
-            out.close();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        criarPasta(path);    
+          FileOutputStream saida;  
+          PrintStream fileSaida;  
+          try  
+          {  
+               saida = new FileOutputStream(path + "index.html");  
+               fileSaida = new PrintStream(saida);  
+               fileSaida.print(dados);  
+               saida.close();
+               fileSaida.close();
+          }  
+          catch (Exception e)  
+          {  
+               System.err.println(e);  
+          }  
     }
     
     public String caminho(String str)
     {
         String temp = str;
         temp = temp.replaceAll("http:", "");
-        temp = temp.replaceAll("/","");
+        temp = temp.replaceAll("//","");
+        temp = temp.replace('/', '.');
         temp = temp.replaceAll("\\.","\\\\");
-        return "\\" + temp;
+        return "src\\dados\\" + temp + "\\";
+    }
+    
+    public void criarPasta(String path)
+    {
+               File file = new File(path);
+               file.mkdirs();
     }
 }
