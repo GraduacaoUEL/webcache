@@ -18,5 +18,7 @@ public class WebCache {
     public static void main(String[] args) throws IOException{
         TelaPrincipal tp = new TelaPrincipal();
         tp.buildGUI();
+//        Files fl = new Files();
+//        System.out.println(fl.separarNome("http://google.com.br/favicon.ico"));
     }
 }

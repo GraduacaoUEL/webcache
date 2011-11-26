@@ -49,6 +49,8 @@ public class BrowserHandler {
         private HttpURLConnection connection;
         private boolean useProxy;
         private String url; //gambi
+        private String dados;
+        Files ar = new Files();
 
         public Request(Socket socket, Boolean proxy) {
             this.socket = socket;
@@ -59,12 +61,14 @@ public class BrowserHandler {
         public void run() {
             readRequest();
             writeResponse();
+ 
         }
 
         public void readRequest() {
             ArrayList<String> request = new ArrayList<String>();
             try {
-                BufferedReader requestReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                InputStreamReader in = new InputStreamReader(socket.getInputStream());
+                BufferedReader requestReader = new BufferedReader(in);
                 for (String line = requestReader.readLine(); line != null && !line.isEmpty(); line = requestReader.readLine()) {
                     request.add(line);
                 }
@@ -151,13 +155,19 @@ public class BrowserHandler {
                     } else {
                         responseReader = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
                     }
-
+                   
                     int readBytes;
                     byte[] buffer = new byte[BUFFER_SIZE];
+                    ar.criarPasta(ar.caminho(url));
+                    FileOutputStream fileWriter = new FileOutputStream(ar.caminho(url) + ar.separarNome(url));
                     while ((readBytes = responseReader.read(buffer)) > 0) {
+                        fileWriter.write(buffer);
                         requestWriter.write(buffer, 0, readBytes);
                         requestWriter.flush();
                     }
+
+                   
+                    fileWriter.close();
                     responseReader.close();
                 }
 
