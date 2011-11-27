@@ -36,14 +36,7 @@ public class TabelaLocal {
     
     public boolean verificar(String ar)
     {
-       boolean ret = false;
-       Iterator it = tabelaIndice.iterator();
-       while(it.hasNext())
-       {
-           System.out.println(it.next());
-               ret = true;
-       }
-       return ret;
+       return tabelaIndice.contains(ar);
     }
     
     public ArrayList getTabela()
