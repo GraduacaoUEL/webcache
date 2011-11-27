@@ -25,6 +25,8 @@ public class BrowserHandler {
     private boolean useProxy;
     private ServerSocket serverSocket;
     private static String usuario, senha;
+    private static TabelaLocal tabelaLocal;
+    private static TabelaGeral tabelaGeral;
 
     public BrowserHandler(int port, boolean proxy, String user, String password) {
         try {
@@ -32,6 +34,8 @@ public class BrowserHandler {
             this.useProxy = proxy;
             this.usuario = user;
             this.senha = password;
+            this.tabelaGeral = new TabelaGeral();
+            this.tabelaLocal = new TabelaLocal();
         } catch (IOException exception) {
             System.err.println("Browser Reader - constructor error");
             System.exit(-1);
@@ -42,7 +46,7 @@ public class BrowserHandler {
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
-                new Request(socket, useProxy).start();
+                new Request(socket, useProxy,tabelaGeral,tabelaLocal).start();
             } catch (IOException exception) {
                 System.err.println("Browser Handler - run error" + exception);
             }
@@ -56,12 +60,16 @@ public class BrowserHandler {
         private boolean useProxy;
         private String url; //gambi
         Files ar = new Files();
-        TabelaLocal tabelaLocal = new TabelaLocal();
-        TabelaGeral tabelaGeral = new TabelaGeral();
+        TabelaLocal tabelaLocal;
+        TabelaGeral tabelaGeral;
         
-        public Request(Socket socket, Boolean proxy) {
+
+
+        private Request(Socket socket, boolean useProxy, TabelaGeral tabelaGeral, TabelaLocal tabelaLocal) {
             this.socket = socket;
-            this.useProxy = proxy;
+            this.useProxy = useProxy;
+            this.tabelaGeral = tabelaGeral;
+            this.tabelaLocal = tabelaLocal;
         }
 
         @Override
