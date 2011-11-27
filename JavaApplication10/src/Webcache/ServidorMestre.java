@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JFrame;
@@ -45,8 +46,15 @@ public class ServidorMestre implements Runnable {
 
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("SERVIDOR");
         frame.setResizable(false);
+        
+        try {
+            String ipTexto = String.valueOf(InetAddress.getLocalHost().getHostAddress());
+            ipTexto = ipTexto.replace("/", "");
+            frame.setTitle("SERVIDOR - " + ipTexto);
+        } catch(UnknownHostException uhs) {
+            frame.setTitle("SERVIDOR");
+        }
 
         textArea = new JTextArea(40, 25);
         textArea.setLineWrap(true);
