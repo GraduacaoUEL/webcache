@@ -4,6 +4,9 @@
  */
 package Webcache;
 
+import Hash.ArquivoIndice;
+import Hash.TabelaGeral;
+import Hash.TabelaLocal;
 import com.sun.org.apache.xml.internal.security.utils.Base64; //ssaporra buga quando gera jar ç.ç
 import java.io.*;
 import java.util.*;
@@ -52,9 +55,10 @@ public class BrowserHandler {
         private HttpURLConnection connection;
         private boolean useProxy;
         private String url; //gambi
-        private String dados;
         Files ar = new Files();
-
+        TabelaLocal tabelaLocal = new TabelaLocal();
+        TabelaGeral tabelaGeral = new TabelaGeral();
+        
         public Request(Socket socket, Boolean proxy) {
             this.socket = socket;
             this.useProxy = proxy;
@@ -64,7 +68,6 @@ public class BrowserHandler {
         public void run() {
             readRequest();
             writeResponse();
-
         }
 
         public void readRequest() {
@@ -84,6 +87,19 @@ public class BrowserHandler {
 
                 connection = (HttpURLConnection) uri.toURL().openConnection();
                 url = uri.toURL().toString();
+                ArquivoIndice temp = new ArquivoIndice();
+                temp.setIp("127.0.0.1");
+                temp.setUrl(url);
+                if(tabelaLocal.verificar(url))
+                {
+                    //pegalocal
+                    System.out.println("pegalocal");
+                }
+                if(tabelaGeral.verificar(url))
+                {
+                    //pegaremoto
+                }
+                //se chegar aqui continua normal;
                 if (useProxy == true) {
                     /* descomentar 1 e 2 usar o cache  da uel*/
                     setProxy("cache.uel.br", "8080");
@@ -167,7 +183,7 @@ public class BrowserHandler {
                         requestWriter.flush();
                     }
 
-
+                    tabelaLocal.add(url);
                     fileWriter.close();
                     responseReader.close();
                 }
