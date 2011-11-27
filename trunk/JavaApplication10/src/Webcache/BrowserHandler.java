@@ -8,10 +8,19 @@ import Hash.ArquivoIndice;
 import Hash.TabelaGeral;
 import Hash.TabelaLocal;
 import com.sun.org.apache.xml.internal.security.utils.Base64; //ssaporra buga quando gera jar ç.ç
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 import java.net.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -27,6 +36,11 @@ public class BrowserHandler {
     private static String usuario, senha;
     private static TabelaLocal tabelaLocal;
     private static TabelaGeral tabelaGeral;
+    
+    private JFrame frame;
+    private JPanel labelPanel, fieldPanel;
+    private JLabel localLabel, remoteLabel, internetLabel;
+    private JTextArea localArea, remoteArea, internetArea;
 
     public BrowserHandler(int port, boolean proxy, String user, String password) {
         try {
@@ -40,6 +54,62 @@ public class BrowserHandler {
             System.err.println("Browser Reader - constructor error");
             System.exit(-1);
         }
+        
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setTitle("Browser Handler");
+        frame.setResizable(false);
+        
+        localArea = new JTextArea(20, 25);
+        localArea.setLineWrap(true);
+        localArea.setWrapStyleWord(true);
+        localArea.setEditable(false);
+        DefaultCaret caretL = (DefaultCaret) localArea.getCaret();
+        caretL.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane localScroller = new JScrollPane(localArea);
+        localScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        localScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        localScroller.setAutoscrolls(true);
+        localLabel = new JLabel("Requisição Local: ");
+        
+        remoteArea = new JTextArea(20, 25);        
+        remoteArea.setLineWrap(true);
+        remoteArea.setWrapStyleWord(true);
+        remoteArea.setEditable(false);
+        DefaultCaret caretR = (DefaultCaret) remoteArea.getCaret();
+        caretR.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane remoteScroller = new JScrollPane(remoteArea);
+        remoteScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        remoteScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        remoteScroller.setAutoscrolls(true);
+        remoteLabel = new JLabel("Requisição Remota: ");
+        
+        internetArea = new JTextArea(20, 25);
+        internetArea.setLineWrap(true);
+        internetArea.setWrapStyleWord(true);
+        internetArea.setEditable(false);
+        DefaultCaret caretI = (DefaultCaret) internetArea.getCaret();
+        caretI.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane internetScroller = new JScrollPane(internetArea);
+        internetScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        internetScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        internetScroller.setAutoscrolls(true);
+        internetLabel = new JLabel("Requisição Web: ");
+        
+        labelPanel = new JPanel(new GridLayout(3,1,1,1));
+        labelPanel.add(localLabel);
+        labelPanel.add(remoteLabel);
+        labelPanel.add(internetLabel);
+        
+        fieldPanel = new JPanel(new GridLayout(3,1,1,1));
+        fieldPanel.add(localScroller);
+        fieldPanel.add(remoteScroller);
+        fieldPanel.add(internetScroller);
+        
+        frame.getContentPane().add(BorderLayout.WEST, labelPanel);
+        frame.getContentPane().add(BorderLayout.CENTER, fieldPanel);
+        frame.setSize(600, 400);
+        frame.setVisible(true);
     }
 
     public void run() {
@@ -83,7 +153,7 @@ public class BrowserHandler {
                 BufferedReader requestReader = new BufferedReader(in);
                 for (String line = requestReader.readLine(); line != null && !line.isEmpty(); line = requestReader.readLine()) {
                     request.add(line);
-                    System.out.println("Linha: " + line);
+                    //System.out.println("Linha: " + line);
                 }
 
                 String[] requestLine = request.get(0).split(" ");
@@ -97,11 +167,12 @@ public class BrowserHandler {
                 ArquivoIndice temp = new ArquivoIndice();
                 temp.setIp("127.0.0.1");
                 temp.setUrl(url);
-                
+
                 /*Se o arquivo se encontra localmente*/
                 if (tabelaLocal.verificar(url)) {
-                    
-                    System.out.println("Pegar Localmente. Caminho do Arquivo " + ar.separarNome(url) + " está no diretorio " + ar.caminho(url));
+
+                    //System.out.println("Pegar Localmente. Caminho do Arquivo " + ar.separarNome(url) + " está no diretorio " + ar.caminho(url));
+                    localArea.append("LOCAL - Arquivo " + ar.separarNome(url) + " no diretório " + ar.caminho(url) + "\n");
 
                     File myFile = new File(ar.caminho(url) + ar.separarNome(url));
                     byte[] mybytearray = new byte[(int) myFile.length()];
@@ -112,15 +183,22 @@ public class BrowserHandler {
                     DataOutputStream requestWriter = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                     requestWriter.write(mybytearray, 0, mybytearray.length);
                     requestWriter.flush();
-                    
-                    System.out.println("Arquivo enviado localmente");
+
+                    //System.out.println("Arquivo enviado localmente");
+                    localArea.append("Arquivo " +ar.separarNome(url) + " enviado ao browser." + "\n \n");
                 }
-                
+
                 /*Se há arquivo no vizinho*/
-                if (tabelaGeral.verificar(url)) {
+                else if (tabelaGeral.verificar(url)) {
+                    remoteArea.append("REMOTO - Arquivo " + ar.separarNome(url) + "\n");
                     //pegaremoto
+                    remoteArea.append("Arquivo " +ar.separarNome(url) + " enviado ao browser." + "\n \n");
                 }
                 
+                else {
+                    internetArea.append("WEB - Arquivo " + ar.separarNome(url) + "\n");
+                }
+
                 //se chegar aqui continua normal;
                 if (useProxy == true) {
                     /* descomentar 1 e 2 usar o cache  da uel*/

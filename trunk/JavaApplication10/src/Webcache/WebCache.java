@@ -15,10 +15,15 @@ public class WebCache {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException {
+    /*public static void main(String[] args) throws IOException {
         TelaPrincipal tp = new TelaPrincipal();
         tp.buildGUI();
-//        Files fl = new Files();
-//        System.out.println(fl.separarNome("http://google.com.br/favicon.ico"));
+        //Files fl = new Files();
+        //System.out.println(fl.separarNome("http://google.com.br/favicon.ico"));
+    }*/
+    
+    public WebCache() {
+        TelaPrincipal t = new TelaPrincipal();
+        t.buildGUI();
     }
 }

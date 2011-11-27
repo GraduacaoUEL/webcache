@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -74,51 +75,61 @@ public class RunClient {
         serverArea.setLineWrap(true);
         serverArea.setWrapStyleWord(true);
         serverArea.setEditable(false);
+        DefaultCaret caretS = (DefaultCaret) serverArea.getCaret();
+        caretS.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane serverScroller = new JScrollPane(serverArea);
         serverScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         serverScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         serverScroller.setAutoscrolls(true);
-        serverLabel = new JLabel("Comunicação com o Servidor");
+        serverLabel = new JLabel("Comunicação com o Servidor: ");
 
         clientArea = new JTextArea(20, 25);
         clientArea.setLineWrap(true);
         clientArea.setWrapStyleWord(true);
         clientArea.setEditable(false);
+        DefaultCaret caretC = (DefaultCaret) clientArea.getCaret();
+        caretC.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane clientScroller = new JScrollPane(clientArea);
         clientScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         clientScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         clientScroller.setAutoscrolls(true);
-        clientLabel = new JLabel("Comunicação com Cliente");
+        clientLabel = new JLabel("Comunicação com Cliente: ");
 
         buscaArea = new JTextArea(20, 25);
         buscaArea.setLineWrap(true);
         buscaArea.setWrapStyleWord(true);
         buscaArea.setEditable(false);
+        DefaultCaret caretB = (DefaultCaret) buscaArea.getCaret();
+        caretB.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane buscaScroller = new JScrollPane(buscaArea);
         buscaScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         buscaScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         buscaScroller.setAutoscrolls(true);
-        buscaLabel = new JLabel("Buscar Arquivo");
+        buscaLabel = new JLabel("Buscar Arquivo: ");
 
         transferArea = new JTextArea(20, 25);
         transferArea.setLineWrap(true);
         transferArea.setWrapStyleWord(true);
         transferArea.setEditable(false);
+        DefaultCaret caretT = (DefaultCaret) transferArea.getCaret();
+        caretT.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane transferScroller = new JScrollPane(transferArea);
         transferScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         transferScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         transferScroller.setAutoscrolls(true);
-        transferLabel = new JLabel("Transferência de Arquivos");
+        transferLabel = new JLabel("Transferência de Arquivos: ");
 
         receberArea = new JTextArea(20, 25);
         receberArea.setLineWrap(true);
         receberArea.setWrapStyleWord(true);
         receberArea.setEditable(false);
+        DefaultCaret caretR = (DefaultCaret) receberArea.getCaret();
+        caretR.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane receberScroller = new JScrollPane(receberArea);
         receberScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         receberScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         receberScroller.setAutoscrolls(true);
-        receberLabel = new JLabel("Download de Arquivos");
+        receberLabel = new JLabel("Download de Arquivos: ");
 
         panelLabel = new JPanel(new GridLayout(5, 1, 1, 1));
         panelLabel.add(serverLabel);
@@ -136,7 +147,7 @@ public class RunClient {
 
         frame.getContentPane().add(BorderLayout.WEST, panelLabel);
         frame.getContentPane().add(BorderLayout.CENTER, panelArea);
-        frame.setSize(1200, 800);
+        frame.setSize(900, 600);
         frame.setVisible(true);
 
         try {
