@@ -15,7 +15,7 @@ public class TabelaGeral {
         private ArrayList tabelaIndice;
         private ArrayList tabelaGeral;
     
-    void TabelaGeral()
+    public TabelaGeral()
     {
        tabelaGeral = new ArrayList();
        tabelaIndice = new ArrayList();
@@ -23,14 +23,11 @@ public class TabelaGeral {
     
     public void add(ArquivoRemoto ar)
     {
-        ArquivoIndice ai = new ArquivoIndice();
-        ai.setIp(ar.getIp());
-        ai.setUrl(ar.getUrl());
         tabelaGeral.add(ar);
-        tabelaIndice.add(ai);
+        tabelaIndice.add(ar.getUrl());
     }
     
-    public boolean verificar(ArquivoIndice ar)
+    public boolean verificar(String ar)
     {
         return tabelaIndice.contains(ar);
     }

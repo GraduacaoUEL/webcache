@@ -6,35 +6,44 @@ package Hash;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  *
  * @author helioalb
  */
 public class TabelaLocal {
-    private ArrayList tabelaIndice;
-    private ArrayList tabela;
+    private ArrayList<String> tabelaIndice;
+    private ArrayList<ArquivoRemoto> tabela;
     
-    void TabelaLocal()
+    public TabelaLocal()
     {
        tabela = new ArrayList();
        tabelaIndice = new ArrayList();
+       
     }
     
-    public void add(ArquivoIndice ar)
+    public void add(String ar)
     {
         ArquivoRemoto br =  new ArquivoRemoto();
-        br.setIp(ar.getIp());
-        br.setUrl(ar.getUrl());
+        br.setIp("127.0.0.1");
+        br.setUrl(ar);
         br.setPing(0);
         br.setVida(System.currentTimeMillis());
         tabelaIndice.add(ar);
         tabela.add(br);
     }
     
-    public boolean verificar(ArquivoIndice ar)
+    public boolean verificar(String ar)
     {
-        return tabelaIndice.contains(ar);
+       boolean ret = false;
+       Iterator it = tabelaIndice.iterator();
+       while(it.hasNext())
+       {
+           System.out.println(it.next());
+               ret = true;
+       }
+       return ret;
     }
     
     public ArrayList getTabela()
