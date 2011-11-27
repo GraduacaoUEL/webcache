@@ -46,7 +46,7 @@ public class BrowserHandler {
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
-                new Request(socket, useProxy,tabelaGeral,tabelaLocal).start();
+                new Request(socket, useProxy, tabelaGeral, tabelaLocal).start();
             } catch (IOException exception) {
                 System.err.println("Browser Handler - run error" + exception);
             }
@@ -62,8 +62,6 @@ public class BrowserHandler {
         Files ar = new Files();
         TabelaLocal tabelaLocal;
         TabelaGeral tabelaGeral;
-        
-
 
         private Request(Socket socket, boolean useProxy, TabelaGeral tabelaGeral, TabelaLocal tabelaLocal) {
             this.socket = socket;
@@ -85,6 +83,7 @@ public class BrowserHandler {
                 BufferedReader requestReader = new BufferedReader(in);
                 for (String line = requestReader.readLine(); line != null && !line.isEmpty(); line = requestReader.readLine()) {
                     request.add(line);
+                    System.out.println("Linha: " + line);
                 }
 
                 String[] requestLine = request.get(0).split(" ");
@@ -98,15 +97,30 @@ public class BrowserHandler {
                 ArquivoIndice temp = new ArquivoIndice();
                 temp.setIp("127.0.0.1");
                 temp.setUrl(url);
-                if(tabelaLocal.verificar(url))
-                {
-                    //pegalocal
-                    System.out.println("pegalocal");
+                
+                /*Se o arquivo se encontra localmente*/
+                if (tabelaLocal.verificar(url)) {
+                    
+                    System.out.println("Pegar Localmente. Caminho do Arquivo " + ar.separarNome(url) + " está no diretorio " + ar.caminho(url));
+
+                    File myFile = new File(ar.caminho(url) + ar.separarNome(url));
+                    byte[] mybytearray = new byte[(int) myFile.length()];
+                    FileInputStream fis = new FileInputStream(myFile);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    bis.read(mybytearray, 0, mybytearray.length);
+
+                    DataOutputStream requestWriter = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+                    requestWriter.write(mybytearray, 0, mybytearray.length);
+                    requestWriter.flush();
+                    
+                    System.out.println("Arquivo enviado localmente");
                 }
-                if(tabelaGeral.verificar(url))
-                {
+                
+                /*Se há arquivo no vizinho*/
+                if (tabelaGeral.verificar(url)) {
                     //pegaremoto
                 }
+                
                 //se chegar aqui continua normal;
                 if (useProxy == true) {
                     /* descomentar 1 e 2 usar o cache  da uel*/
