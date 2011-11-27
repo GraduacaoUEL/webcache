@@ -32,7 +32,7 @@ public class RunClient {
     private PrintWriter writerMasterServer;
     private Socket sockMasterServer;
     private BufferedReader readerMasterServer;
-    private static String ipServidorMestre = "127.0.0.1";
+    private static String ipServidorMestre;// = "127.0.0.1";
     private static int portaServidorMestre = 5555;
     
     //Atributos para ativa o Socket de comunicação com outros clientes
@@ -44,6 +44,7 @@ public class RunClient {
     private PrintWriter writerWithClient;
     private ArrayList listaClientes;
     private static int portaComunicacaoClienteCliente = 5556;
+    private int findFile;
     
     //Atributos para Transferência de Arquivo
     private Thread connectionFileClientClient_Thread;
@@ -57,12 +58,13 @@ public class RunClient {
     private JTextArea serverArea, buscaArea, clientArea, transferArea, receberArea;
     private JLabel serverLabel, buscaLabel, clientLabel, transferLabel, receberLabel;
 
-    public static void main(String[] args) throws IOException {
+    /*public static void main(String[] args) throws IOException {
         RunClient rc = new RunClient();
-    }
+    }*/
 
-    public RunClient() throws IOException {
+    public RunClient(String ipServer) throws IOException {
 
+        ipServidorMestre = ipServer;
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Monitoramento");
@@ -137,32 +139,25 @@ public class RunClient {
         frame.setSize(1200, 800);
         frame.setVisible(true);
 
-        //Ativa a parte de conexão com o Servidor Mestre
-        connectionToMasterServer_Thread = new Thread(new connectionToMasterServer(ipServidorMestre, portaServidorMestre));
-        connectionToMasterServer_Thread.start();
+        try {
+            //Ativa a parte de conexão com o Servidor Mestre
+            connectionToMasterServer_Thread = new Thread(new connectionToMasterServer(ipServidorMestre, portaServidorMestre));
+            connectionToMasterServer_Thread.start();
 
+            //Ativa a parte que comunicação direta com outros clientes        
+            connectionClientClient_Thread = new Thread(new connectionClientClient(portaComunicacaoClienteCliente));
+            connectionClientClient_Thread.start();
 
-
-
-        //Ativa a parte que comunicação direta com outros clientes        
-        connectionClientClient_Thread = new Thread(new connectionClientClient(portaComunicacaoClienteCliente));
-        connectionClientClient_Thread.start();
-
-        //Ativa a conexão de Transferência de Arquivo
-        connectionFileClientClient_Thread = new Thread(new connectionFileClientClient(portaFileTransfer));
-        connectionFileClientClient_Thread.start();
+            //Ativa a conexão de Transferência de Arquivo
+            connectionFileClientClient_Thread = new Thread(new connectionFileClientClient(portaFileTransfer));
+            connectionFileClientClient_Thread.start();
+                
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
 
         //inicia a arraylist
-        listaClientes = new ArrayList();
-
-
-
-        /*EXECUTAR SEPARADO PARA TESTAR - COMENTAR A LINHA 58 A 63*/
-        String[] listaArquivos = {"reg_alloc.pdf", "Web_Cache_Distribuido.pdf", "Gramatica C.docx", "WebCacheDistribuido.rar"};
-
-        System.out.println("Quantidade de Arquivos a ser resgatados: " + listaArquivos.length);
-        //connectionWithClient_Thread = new Thread(new startConnectionWithClient("127.0.0.1", portaComunicacaoClienteCliente, listaArquivos));
-        //connectionWithClient_Thread.start();       
+        listaClientes = new ArrayList();        
     }
 
     //Realiza conexão com o Servidor Mestre
@@ -185,11 +180,11 @@ public class RunClient {
                     writerMasterServer.flush();
                 } catch (Exception ex) {
                     System.out.println("FALHA AO COMUNICAR COM O SERVIDOR");
-                    //ex.printStackTrace();
+                    ex.printStackTrace();
                 }
             } catch (IOException ex) {
                 System.out.println("FALHA AO TENTAR CONECTAR COM O SERVIDOR");
-                //ex.printStackTrace();
+                ex.printStackTrace();
             }
         }
 
@@ -351,6 +346,22 @@ public class RunClient {
         }
     }//Fim do connectionClientClient
 
+    //Método para procurar arquivos
+    public boolean findTheFile(String IP, String[] files) {
+        
+        findFile = 0;
+        System.out.println("Quantidade de Arquivos a ser resgatados: " + files.length);
+        connectionWithClient_Thread = new Thread(new startConnectionWithClient(IP, portaComunicacaoClienteCliente, files));
+        connectionWithClient_Thread.start(); 
+        
+        while (findFile == 0) {}           
+        if(findFile == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     //Conexão entre Cliente-Cliente (Procura)
     private class startConnectionWithClient implements Runnable {
 
@@ -395,10 +406,12 @@ public class RunClient {
                             tempListen = new Thread(new startGetTransfer(IPneighbor, portaFileTransfer, NomeArq));
                             tempListen.start();
                             System.out.println("Transferencia terminada");
+                            findFile = 1;
                             endProcess = true;
                         } else if (message.equals("NaoTenhoOArquivo")) {
                             System.out.println("O Vizinho não tem o arquivo");
                             buscaArea.append("O " + sockWithClient.getInetAddress() + " não tem o Arquivo " + NomeArq + ". \n");
+                            findFile = -1;
                             endProcess = true;
                         }
                     }
